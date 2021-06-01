@@ -4,6 +4,16 @@ An embeddable Swift interpreter for all versions of iOS, Mac, tvOS, and watchOS.
 
 ## Features
 
+Optional Libraries Supported
+
+- Foundation
+- Combine
+- SwiftUI
+
+See (TEST_RESULTS.md)[https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/TEST_RESULTS.md].
+
+## Test Results
+
 The Swift interpreter has automated tests which run against real compiled Swift. You can see those test results in the generated MD file called (TEST_RESULTS.md)[https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/TEST_RESULTS.md].
 
 Each time `run_tests.sh` is run while on the "staging" or "main" branch, this md `TEST_RESULTS.md` is automatically updated.
