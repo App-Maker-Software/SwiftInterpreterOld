@@ -13,19 +13,26 @@ doc = xml.dom.minidom.parse("Tests/Results.xml")
 
 results = dict()
 
+def remove_prefix(text, prefix):
+    return text[text.startswith(prefix) and len(prefix):]
+
 class Result:
-    def __init__(self, classname, name, time, failed):
+    def __init__(self, classname, name, time, failed, link):
         self.classname = classname
         self.name = name
         self.time = time
         self.failed = failed
+        self.link = link
 
 def handleTestcase(testcase):
+    classname = testcase.getAttribute("classname").replace("SwiftInterpreterTests.", "")
+    name = testcase.getAttribute("name")
     result = Result(
-        testcase.getAttribute("classname").replace("SwiftInterpreterTests.", ""),
-        testcase.getAttribute("name"),
+        classname,
+        name,
         testcase.getAttribute("time"),
-        len(testcase.getElementsByTagName("failure")) > 0
+        len(testcase.getElementsByTagName("failure")) > 0,
+        "https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/Tests/SwiftInterpreterTests/CodeTests/" + classname + "/" + remove_prefix(AnotherOne.rstrip(string.digits), "test") + ".swift"
     )
     if result.classname in results:
         results[result.classname].append(result)
@@ -45,8 +52,8 @@ def writeResultsToMdFile():
     for key in keys:
         mdFile = mdFile + """
 ### """ + key + """
-| Result | Test Name | Time |
-|:------:|:-------:|:-------:|
+| Result | Test Name | Time | Code |
+|:------:|:-------:|:-------:|:-------:|
 """
         values = sorted(results[key], key=lambda el: el.name)
         for result in values:
@@ -56,7 +63,8 @@ def writeResultsToMdFile():
                 mdFile = mdFile + "| ✅ "
             mdFile = mdFile + "|" + result.name
             mdFile = mdFile + "|" + result.time
-            mdFile = mdFile + "|" + result.time + "|"
+            mdFile = mdFile + "|" + result.time
+            mdFile = mdFile + "|[View Code](" + result.link + ")|"
             mdFile = mdFile + "\n"
 
 writeResultsToMdFile()
