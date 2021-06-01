@@ -23,6 +23,8 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "SwiftInterpreterTests",
-            dependencies: ["SwiftInterpreter"]),
+            dependencies: ["SwiftInterpreter"],
+            exclude: ["CodeTests/"],
+            resources: [.copy("ASTData")]),
     ]
 )
