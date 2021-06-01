@@ -7,9 +7,22 @@
 
 import Foundation
 import SwiftASTConstructor
+#if canImport(SwiftInterpreterFromSource)
+import SwiftInterpreterFromSource
+#elseif canImport(SwiftInterpreterLocalBinary)
+import SwiftInterpreterLocalBinary
+#else
 import SwiftInterpreter
+#endif
+
 
 func interpretFromString(_ code: String) throws -> Any {
     let astData = try SwiftASTConstructor.constructAST(from: code)
-    return try SwiftInterpreter.interpret(astData)
+    #if canImport(SwiftInterpreterFromSource)
+    return try SwiftInterpreterFromSource.interpret(astData)
+    #elseif canImport(SwiftInterpreterLocalBinary)
+    return try SwiftInterpreterLocalBinary.interpret(astData)
+    #else
+    return try SwiftASTConstructor.interpret(astData)
+    #endif
 }

@@ -1,2 +1,2 @@
 // assert matching_return_value
-return 0
+return "hello"

@@ -1,19 +1,25 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.4
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 import Foundation
 
-var dependencies: [Package.Dependency] = [
-    .package(name: "SwiftAST", url: "https://github.com/App-Maker-Software/SwiftAST.git", .exact("0.50400.0")),
+var products: [Product] = [
+    .library(
+        name: "SwiftInterpreter",
+        targets: ["SwiftInterpreter"]
+    )
 ]
-let targets: [Target] = [
-    .target(name: "SwiftInterpreter"),
+var dependencies: [Package.Dependency] = [
+    .package(name: "SwiftASTConstructor", url: "https://github.com/App-Maker-Software/SwiftASTConstructor.git", .exact("0.50400.0")),
+]
+var targets: [Target] = [
+    .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterBinary"]),
     .testTarget(
         name: "SwiftInterpreterTests",
         dependencies: [
             "SwiftInterpreter",
-            .product(name: "SwiftASTConstructor", package: "SwiftAST")
+            .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
         ],
         exclude: [
             "CodeTests/",
@@ -23,28 +29,52 @@ let targets: [Target] = [
             "build_automatic_tests.pyc"
         ]
     ),
+    .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0/SwiftInterpreterBinary.xcframework.zip", checksum: "")
 ]
 
 if ProcessInfo.processInfo.environment["BUILD_SWIFT_INTERPRETER_FROM_SOURCE"] != nil {
-    dependencies.append(.package(name: "SwiftInterpreterSource", path: "../SwiftInterpreterSource"))
-    targets[0].dependencies = ["SwiftInterpreterSource"]
-} else if if ProcessInfo.processInfo.environment["TEST_SWIFT_INTERPRETER_BINARY"] != nil {
-    targets.append(.binaryTarget(name: "SwiftInterpreterBinary", path: "../SwiftInterpreterSource/SwiftInterpreterBinary.xcframework.zip"))
-    targets[0].dependencies = ["SwiftInterpreterBinary"]
-} else {
-    #error("no remote binary support yet")
-//    targets.append(.binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/<#T##String#>/SwiftInterpreterBinary.xcframework.zip", checksum: <#T##String#>))
-    targets[0].dependencies = ["SwiftInterpreterBinary"]
+    // add source as a dependency
+    dependencies.append(.package(name: "SwiftInterpreterSource", url: "git@github.com:App-Maker-Software/SwiftInterpreterSource.git", .branch("main")))
+    // add source as a target
+    targets.append(.target(name: "SwiftInterpreterFromSource", dependencies: ["SwiftInterpreterSource"]))
+    // add local binary builds as a target
+    targets.append(.binaryTarget(name: "SwiftInterpreterLocalBinary", path: "../SwiftInterpreterSource/SwiftInterpreterBinary.xcframework"))
+    // add two new products, one for building from source, and one for testing local binary builds
+    products.append(contentsOf: [
+        .library(
+            name: "SwiftInterpreterFromSource",
+            targets: ["SwiftInterpreterFromSource"]
+        ),
+        .library(
+            name: "SwiftInterpreterFromLocalBinary",
+            targets: ["SwiftInterpreterLocalBinary"]
+        ),
+    ])
+    // add new dependencies to test target
+    if targets[1].name != "SwiftInterpreterTests" { // sanity check
+        fatalError()
+    }
+    let copy = targets[1]
+    copy.name = "SwiftInterpreterFromSourceTests"
+    copy.path = "Tests/_SwiftInterpreterFromSourceTests"
+    copy.dependencies = [
+        "SwiftInterpreterFromSource",
+        .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
+    ]
+    targets.append(copy)
+    let copy2 = targets[1]
+    copy2.name = "SwiftInterpreterFromLocalBinaryTests"
+    copy2.path = "Tests/_SwiftInterpreterFromLocalBinaryTests"
+    copy2.dependencies = [
+        "SwiftInterpreterLocalBinary",
+        .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
+    ]
+    targets.append(copy2)
 }
 
 let package = Package(
     name: "SwiftInterpreter",
-    products: [
-        .library(
-            name: "SwiftInterpreter",
-            targets: ["SwiftInterpreter"]
-        )
-    ],
+    products: products,
     dependencies: dependencies,
     targets: targets
 )

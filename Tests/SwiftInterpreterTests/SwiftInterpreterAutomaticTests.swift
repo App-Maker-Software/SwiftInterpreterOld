@@ -21,7 +21,7 @@ final class Example: XCTestCase {
             //
             // start interpreted section
             //
-            return 0
+            return "hello"
             
             //
             // end interpreted section
@@ -31,7 +31,7 @@ final class Example: XCTestCase {
             //
             // start compiled section
             //
-            return 0
+            return "hello"
             
             //
             // end compiled section
