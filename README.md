@@ -62,3 +62,10 @@ There are three assertions currently supported.
 
 - does not attempt to compile the Swift code, as it would fail
 - test expects interpreter to throw an error
+
+## Building from Source
+
+Note: The Swift Interpreter is provided as a prebuilt binary, if you would like to have access to source, contact Joe Hinkle.
+
+To build from source, first clone [SwiftInterpreterSource](https://github.com/App-Maker-Software/SwiftInterpreterSource) in the same directory as this repo.
+1. 
