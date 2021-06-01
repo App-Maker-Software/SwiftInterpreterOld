@@ -14,6 +14,8 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
+        .package(name: "SwiftAST", url: "https://github.com/App-Maker-Software/SwiftAST.git", .exact("0.50400.0")),
+
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -23,8 +25,16 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "SwiftInterpreterTests",
-            dependencies: ["SwiftInterpreter"],
-            exclude: ["CodeTests/"],
-            resources: [.copy("ASTData")]),
+            dependencies: [
+                "SwiftInterpreter",
+                .product(name: "SwiftASTConstructor", package: "SwiftAST")
+            ],
+            exclude: [
+                "CodeTests/",
+                "quick_test.py",
+                "quick_test.pyc",
+                "build_automatic_tests.py",
+                "build_automatic_tests.pyc"
+            ]),
     ]
 )
