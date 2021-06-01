@@ -10,4 +10,4 @@
 |:------:|:-------:|:-------:|
 | ❗️ |testAnotherOne1|0.0|0.0|
 | ❗️ |testAnotherOne2|0.0|0.0|
-| ✅ |testSomething|0.0|0.0|
+| ❗️ |testSomething|0.0|0.0|
