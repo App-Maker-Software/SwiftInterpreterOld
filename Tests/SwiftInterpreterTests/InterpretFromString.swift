@@ -17,12 +17,12 @@ import SwiftInterpreter
 
 
 func interpretFromString(_ code: String) throws -> Any {
-    let astData = try SwiftASTConstructor.constructAST(from: code)
+    let astData = [UInt8](try SwiftASTConstructor.constructAST(from: code))
     #if canImport(SwiftInterpreterFromSource)
     return try SwiftInterpreterFromSource.interpret(astData)
     #elseif canImport(SwiftInterpreterLocalBinary)
     return try SwiftInterpreterLocalBinary.interpret(astData)
     #else
-    return try SwiftASTConstructor.interpret(astData)
+    return try SwiftInterpreter.interpret(astData)
     #endif
 }

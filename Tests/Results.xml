@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-<testsuite name="TestResults" errors="0" tests="3" failures="3" time="0.0">
+<testsuite name="TestResults" errors="0" tests="3" failures="2" time="0.0">
+<testcase classname="SwiftInterpreterTests.Example" name="testAnotherOne2" time="0.0">
+<failure message="failed"></failure>
+</testcase>
 <testcase classname="SwiftInterpreterTests.Example" name="testSomething" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Example" name="testAnotherOne1" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Example" name="testAnotherOne2" time="0.0">
-<failure message="failed"></failure>
 </testcase>
 </testsuite>
 </testsuites>

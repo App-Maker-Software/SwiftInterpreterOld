@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import xml.dom.minidom
+import string
 
 mdFile = """# Test Results
 
@@ -32,7 +33,7 @@ def handleTestcase(testcase):
         name,
         testcase.getAttribute("time"),
         len(testcase.getElementsByTagName("failure")) > 0,
-        "https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/Tests/SwiftInterpreterTests/CodeTests/" + classname + "/" + remove_prefix(AnotherOne.rstrip(string.digits), "test") + ".swift"
+        "https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/Tests/SwiftInterpreterTests/CodeTests/" + classname + "/" + remove_prefix(name.rstrip(string.digits), "test") + ".swift"
     )
     if result.classname in results:
         results[result.classname].append(result)
