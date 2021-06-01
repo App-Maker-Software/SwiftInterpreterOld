@@ -71,7 +71,7 @@ To build from source, first clone [SwiftInterpreterSource](https://github.com/Ap
 
 <img width="330" alt="image" src="https://user-images.githubusercontent.com/8505851/120383244-e4622700-c2e1-11eb-84b5-8ac140bc45fa.png">
 
-Then run `swift package generate-xcodeproj` to produce `SwiftInterpreter.xcodeproj`.
+Then run `export BUILD_SWIFT_INTERPRETER_FROM_SOURCE=1;swift package generate-xcodeproj` to produce `SwiftInterpreter.xcodeproj`.
 
 Then drag the `SwiftInterpreterSource` folder into the navigation panel of SwiftInterpreter. This should prompt asking to create a workspace. Create the workspace under the `SwiftInterpreter` folder and call it `SwiftInterpreter.xcworkspace`.
 
