@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftSyntax",
+        "repositoryURL": "https://github.com/apple/swift-syntax.git",
+        "state": {
+          "branch": null,
+          "revision": "2fff9fc25cdc059379b6bd309377cfab45d8520c",
+          "version": "0.50400.0"
+        }
+      },
+      {
+        "package": "SwiftAST",
+        "repositoryURL": "https://github.com/App-Maker-Software/SwiftAST.git",
+        "state": {
+          "branch": null,
+          "revision": "8568cd282af4e8bc153d92c4bb4af850c94ae5da",
+          "version": "0.50400.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

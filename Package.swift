@@ -28,6 +28,13 @@ let targets: [Target] = [
 if ProcessInfo.processInfo.environment["BUILD_SWIFT_INTERPRETER_FROM_SOURCE"] != nil {
     dependencies.append(.package(name: "SwiftInterpreterSource", path: "../SwiftInterpreterSource"))
     targets[0].dependencies = ["SwiftInterpreterSource"]
+} else if if ProcessInfo.processInfo.environment["TEST_SWIFT_INTERPRETER_BINARY"] != nil {
+    targets.append(.binaryTarget(name: "SwiftInterpreterBinary", path: "../SwiftInterpreterSource/SwiftInterpreterBinary.xcframework.zip"))
+    targets[0].dependencies = ["SwiftInterpreterBinary"]
+} else {
+    #error("no remote binary support yet")
+//    targets.append(.binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/<#T##String#>/SwiftInterpreterBinary.xcframework.zip", checksum: <#T##String#>))
+    targets[0].dependencies = ["SwiftInterpreterBinary"]
 }
 
 let package = Package(

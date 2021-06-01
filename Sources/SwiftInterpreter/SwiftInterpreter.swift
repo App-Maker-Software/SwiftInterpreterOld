@@ -2,13 +2,19 @@ import Foundation
 #if canImport(SwiftInterpreterSource)
 import SwiftInterpreterSource
 #endif
+#if canImport(SwiftInterpreterBinary)
+import SwiftInterpreterBinary
+#endif
+#if canImport(SwiftInterpreterBinary) && canImport(SwiftInterpreterSource)
+#error("only either SwiftInterpreterBinary or SwiftInterpreterSource should be included in build")
+#endif
 
 public func interpret(_ astData: Data) throws -> Any {
-    fatalError(ProcessInfo.processInfo.environment["BUILD_SWIFT_INTERPRETER_FROM_SOURCE"]!)
     #if canImport(SwiftInterpreterSource)
-    print(SwiftInterpreterSource.testValue)
-    return 0
+    return try SwiftInterpreterSource.interpret(astData)
+    #elseif canImport(SwiftInterpreterBinary)
+    return try SwiftInterpreterBinary.interpret(astData)
     #else
-    return -1
+    #error("no swift interpreter found")
     #endif
 }
