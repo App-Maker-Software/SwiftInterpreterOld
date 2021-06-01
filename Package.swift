@@ -14,7 +14,7 @@ var dependencies: [Package.Dependency] = [
     .package(name: "SwiftASTConstructor", url: "https://github.com/App-Maker-Software/SwiftASTConstructor.git", .exact("0.50400.0")),
 ]
 var targets: [Target] = [
-    .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterBinary"]),
+    .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterRemoteBinary"]),
     .testTarget(
         name: "SwiftInterpreterTests",
         dependencies: [
@@ -29,16 +29,16 @@ var targets: [Target] = [
             "build_automatic_tests.pyc"
         ]
     ),
-    .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.3.0/SwiftInterpreterBinary.xcframework.zip", checksum: "a1942a1ffb6e32a96867721532d31806df61d86b92ec13ef8b01784d988be24a")
+    .binaryTarget(name: "SwiftInterpreterRemoteBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.3.0/SwiftInterpreterBinary.xcframework.zip", checksum: "a1942a1ffb6e32a96867721532d31806df61d86b92ec13ef8b01784d988be24a")
 ]
 
-if ProcessInfo.processInfo.environment["BUILD_SWIFT_INTERPRETER_FROM_SOURCE"] != nil {
+if true || ProcessInfo.processInfo.environment["BUILD_SWIFT_INTERPRETER_FROM_SOURCE"] != nil {
     // add source as a dependency
     dependencies.append(.package(name: "SwiftInterpreterSource", url: "git@github.com:App-Maker-Software/SwiftInterpreterSource.git", .branch("main")))
     // add source as a target
     targets.append(.target(name: "SwiftInterpreterFromSource", dependencies: ["SwiftInterpreterSource"]))
     // add local binary builds as a target
-    targets.append(.binaryTarget(name: "SwiftInterpreterLocalBinary", path: "../SwiftInterpreterSource/SwiftInterpreterBinary.xcframework"))
+    targets.append(.binaryTarget(name: "SwiftInterpreterLocalBinary", path: "SwiftInterpreterLocalBinary.xcframework"))
     // add two new products, one for building from source, and one for testing local binary builds
     products.append(contentsOf: [
         .library(
@@ -54,22 +54,11 @@ if ProcessInfo.processInfo.environment["BUILD_SWIFT_INTERPRETER_FROM_SOURCE"] !=
     if targets[1].name != "SwiftInterpreterTests" { // sanity check
         fatalError()
     }
-    let copy = targets[1]
-    copy.name = "SwiftInterpreterFromSourceTests"
-    copy.path = "Tests/_SwiftInterpreterFromSourceTests"
-    copy.dependencies = [
+    targets[1].dependencies.append(contentsOf: [
         "SwiftInterpreterFromSource",
-        .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
-    ]
-    targets.append(copy)
-    let copy2 = targets[1]
-    copy2.name = "SwiftInterpreterFromLocalBinaryTests"
-    copy2.path = "Tests/_SwiftInterpreterFromLocalBinaryTests"
-    copy2.dependencies = [
-        "SwiftInterpreterLocalBinary",
-        .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
-    ]
-    targets.append(copy2)
+        "SwiftInterpreterLocalBinary"
+//        .product(name: "SwiftInterpreterLocalBinary", package: "SwiftInterpreter")
+    ])
 }
 
 let package = Package(
