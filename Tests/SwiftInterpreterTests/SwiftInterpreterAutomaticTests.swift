@@ -4,24 +4,1800 @@
 //
 
 import XCTest
-@testable import SwiftInterpreter
 
 #if !canImport(ObjectiveC)
 final class SwiftInterpreterAutomaticTests {
     public static let testCases: [XCTestCaseEntry] = [
-        testCase(Example.allTests),
+        testCase(SimpleVariableChange.allTests),        testCase(Modulus.allTests),        testCase(IfBlock.allTests),        testCase(Encapsulation.allTests),        testCase(SimpleString.allTests),        testCase(Comparisons.allTests),        testCase(TernaryOperators.allTests),        testCase(Array.allTests),        testCase(Recursion.allTests),        testCase(FunctionalProgramming.allTests),        testCase(Extensions.allTests),        testCase(SimpleFunctionCallToPassValues.allTests),        testCase(Equality.allTests),        testCase(DeclarationOrder.allTests),        testCase(Boolean.allTests),        testCase(StressTest.allTests),        testCase(SortingFunction.allTests),        testCase(Switch.allTests),        testCase(SimpleFunctionCall.allTests),        testCase(Loops.allTests),        testCase(Generic.allTests),        testCase(Closures.allTests),        testCase(Import.allTests),        testCase(UnaryOperators.allTests),        testCase(DeclareWithType.allTests),
     ]
 }
 #endif
 
-final class Example: XCTestCase {
+final class SimpleVariableChange: XCTestCase {
 
-    func testSomething() throws {
+    func testPreventVariableShadowingFunction1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func x2() -> Int {
+                return 0
+            }
+            let x = 5
+            let y = x + x2()
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func x2() -> Int {
+                return 0
+            }
+            let x = 5
+            let y = x + x2()
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = y
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("y") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testPreventVariableShadowingFunction2() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func x() -> Int {
+                return 0
+            }
+            let x = 5
+            let y = x + x()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testAddingToVariable1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            let y = 5 + 2
+            x = x + y
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            let y = 5 + 2
+            x = x + y
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testAddingToVariable2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            var y = 5 + 2
+            y = x + y
+            x = x + y
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            var y = 5 + 2
+            y = x + y
+            x = x + y
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testMultiplyingVariables1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            let y = 5 + 2
+            x = x * y
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            let y = 5 + 2
+            x = x * y
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testMultiplyingVariables2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            var y = 5 + 2
+            y = x * y
+            x = x * y
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            var y = 5 + 2
+            y = x * y
+            x = x * y
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testMultiplyingVariables3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            var y = 5 + 2
+            y = x * y
+            x = x * y
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            var y = 5 + 2
+            y = x * y
+            x = x * y
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testPreventVariableShadowingFunction1", testPreventVariableShadowingFunction1),
+        ("testPreventVariableShadowingFunction2", testPreventVariableShadowingFunction2),
+        ("testAddingToVariable1", testAddingToVariable1),
+        ("testAddingToVariable2", testAddingToVariable2),
+        ("testMultiplyingVariables1", testMultiplyingVariables1),
+        ("testMultiplyingVariables2", testMultiplyingVariables2),
+        ("testMultiplyingVariables3", testMultiplyingVariables3),
+    ]
+}
+
+final class Modulus: XCTestCase {
+
+    func testSimpleModulus1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 12 % 2
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 12 % 2
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleModulus2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 13 % 2
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 13 % 2
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleModulus3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 13 % 10
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 13 % 10
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleModulus4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1303 % 7
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 1303 % 7
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleModulus5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1303 % 7.5
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleModulus6() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1303.5 % 7
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleModulus7() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1303 % 7.0
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleModulus8() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1303.0 % 7
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleModulus9() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1303.0 % 7.0
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testSimpleModulus1", testSimpleModulus1),
+        ("testSimpleModulus2", testSimpleModulus2),
+        ("testSimpleModulus3", testSimpleModulus3),
+        ("testSimpleModulus4", testSimpleModulus4),
+        ("testSimpleModulus5", testSimpleModulus5),
+        ("testSimpleModulus6", testSimpleModulus6),
+        ("testSimpleModulus7", testSimpleModulus7),
+        ("testSimpleModulus8", testSimpleModulus8),
+        ("testSimpleModulus9", testSimpleModulus9),
+    ]
+}
+
+final class IfBlock: XCTestCase {
+
+    func testSimpleIf1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if true {
+                x = 2
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if true {
+                x = 2
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIf2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 0
+            if false {
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 0
+            if false {
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIf3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 0
+            if true {
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 0
+            if true {
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIf4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if true {
+                x = 2
+            } else {
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if true {
+                x = 2
+            } else {
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIf5() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if false {
+            } else {
+                x = 3
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if false {
+            } else {
+                x = 3
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIf6() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            var y = 2
+            y = y + 1
+            if y != 2 {
+                x = 2
+            }
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            var y = 2
+            y = y + 1
+            if y != 2 {
+                x = 2
+            }
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if true {
+                x = 2
+            } else if false {
+                x = 3
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if true {
+                x = 2
+            } else if false {
+                x = 3
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if true {
+                x = 3
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if true {
+                x = 3
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if false {
+                x = 3
+            } else if false {
+                x = 3
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if false {
+                x = 3
+            } else if false {
+                x = 3
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if false {
+                x = 3
+            } else if false {
+                x = 33
+            } else {
+                x = 10
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if false {
+                x = 3
+            } else if false {
+                x = 33
+            } else {
+                x = 10
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse5() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if x == 0 {
+                x = 3
+            } else {
+                x = 0
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if x == 2 {
+                x = 2
+            } else if x == 0 {
+                x = 3
+            } else {
+                x = 0
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse6() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 0
+            if x == 0 {
+                x = 2
+            } else if x == 2 {
+                x = 3
+            } else {
+                x = 0
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 0
+            if x == 0 {
+                x = 2
+            } else if x == 2 {
+                x = 3
+            } else {
+                x = 0
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleIfElse7() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 2
+            if x == 0 {
+                x = 2
+            } else if x == 2 {
+                x = 3
+            } else {
+                x = 0
+            }
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 2
+            if x == 0 {
+                x = 2
+            } else if x == 2 {
+                x = 3
+            } else {
+                x = 0
+            }
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testSimpleIf1", testSimpleIf1),
+        ("testSimpleIf2", testSimpleIf2),
+        ("testSimpleIf3", testSimpleIf3),
+        ("testSimpleIf4", testSimpleIf4),
+        ("testSimpleIf5", testSimpleIf5),
+        ("testSimpleIf6", testSimpleIf6),
+        ("testSimpleIfElse1", testSimpleIfElse1),
+        ("testSimpleIfElse2", testSimpleIfElse2),
+        ("testSimpleIfElse3", testSimpleIfElse3),
+        ("testSimpleIfElse4", testSimpleIfElse4),
+        ("testSimpleIfElse5", testSimpleIfElse5),
+        ("testSimpleIfElse6", testSimpleIfElse6),
+        ("testSimpleIfElse7", testSimpleIfElse7),
+    ]
+}
+
+final class Encapsulation: XCTestCase {
+
+    func testLocalVariables1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 4
+            x = x + 1
+            func shouldntAdd() {
+                var x = x
+                x = x + 5
+            }
+            shouldntAdd()
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 4
+            x = x + 1
+            func shouldntAdd() {
+                var x = x
+                x = x + 5
+            }
+            shouldntAdd()
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLocalVariables2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 4
+            x = x + 1
+            func shouldAdd() {
+                x = x + 5
+            }
+            shouldAdd()
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 4
+            x = x + 1
+            func shouldAdd() {
+                x = x + 5
+            }
+            shouldAdd()
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLocalVariables3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 4
+            func shouldFailDoingAdd() {
+                x = x + 5
+            }
+            shouldFailDoingAdd()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testLocalVariables1", testLocalVariables1),
+        ("testLocalVariables2", testLocalVariables2),
+        ("testLocalVariables3", testLocalVariables3),
+    ]
+}
+
+final class SimpleString: XCTestCase {
+
+    func testStringAssignment() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = "hello world"
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = "hello world"
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testConcatenation() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            // todo
+            let x = "hello "
+            let y = "world"
+            let result = x + y
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            // todo
+            let x = "hello "
+            let y = "world"
+            let result = x + y
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testStringAssignment", testStringAssignment),
+        ("testConcatenation", testConcatenation),
+    ]
+}
+
+final class Comparisons: XCTestCase {
+
+    func testLessThanGreaterThan1() throws {
         let interpretedReturnResult = try interpretFromString("""
             //
             // start interpreted section
             //
-            return "hello"
+            return 5 < 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 < 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 > 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 > 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 <= 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 <= 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 >= 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 >= 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 < 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 < 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 > 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 > 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan7() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 <= 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 <= 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 >= 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 >= 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan9() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 < 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 < 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan10() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 > 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 > 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan11() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 <= 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 <= 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan12() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 >= 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 >= 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan13() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4.5 < 5
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testLessThanGreaterThan14() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4.5 > 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4.5 > 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan15() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4.5 <= 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4.5 <= 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan16() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4.5 >= 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4.5 >= 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan17() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 < 5.5
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testLessThanGreaterThan18() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 > 5.5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 > 5.5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan19() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 <= 5.5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 <= 5.5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan20() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 4 >= 5.5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 4 >= 5.5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan21() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5.5 < 4
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testLessThanGreaterThan22() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5.5 > 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5.5 > 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan23() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5.5 <= 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5.5 <= 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan24() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5.5 >= 4
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5.5 >= 4
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan25() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 < 4.5
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testLessThanGreaterThan26() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 > 4.5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 > 4.5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan27() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 <= 4.5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 <= 4.5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessThanGreaterThan28() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 >= 4.5
             
             //
             // end interpreted section
@@ -31,7 +1807,7 @@ final class Example: XCTestCase {
             //
             // start compiled section
             //
-            return "hello"
+            return 5 >= 4.5
             
             //
             // end compiled section
@@ -42,7 +1818,1035 @@ final class Example: XCTestCase {
         XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
     }
 
-    func testAnotherOne1() throws {
+    static var allTests = [
+        ("testLessThanGreaterThan1", testLessThanGreaterThan1),
+        ("testLessThanGreaterThan2", testLessThanGreaterThan2),
+        ("testLessThanGreaterThan3", testLessThanGreaterThan3),
+        ("testLessThanGreaterThan4", testLessThanGreaterThan4),
+        ("testLessThanGreaterThan5", testLessThanGreaterThan5),
+        ("testLessThanGreaterThan6", testLessThanGreaterThan6),
+        ("testLessThanGreaterThan7", testLessThanGreaterThan7),
+        ("testLessThanGreaterThan8", testLessThanGreaterThan8),
+        ("testLessThanGreaterThan9", testLessThanGreaterThan9),
+        ("testLessThanGreaterThan10", testLessThanGreaterThan10),
+        ("testLessThanGreaterThan11", testLessThanGreaterThan11),
+        ("testLessThanGreaterThan12", testLessThanGreaterThan12),
+        ("testLessThanGreaterThan13", testLessThanGreaterThan13),
+        ("testLessThanGreaterThan14", testLessThanGreaterThan14),
+        ("testLessThanGreaterThan15", testLessThanGreaterThan15),
+        ("testLessThanGreaterThan16", testLessThanGreaterThan16),
+        ("testLessThanGreaterThan17", testLessThanGreaterThan17),
+        ("testLessThanGreaterThan18", testLessThanGreaterThan18),
+        ("testLessThanGreaterThan19", testLessThanGreaterThan19),
+        ("testLessThanGreaterThan20", testLessThanGreaterThan20),
+        ("testLessThanGreaterThan21", testLessThanGreaterThan21),
+        ("testLessThanGreaterThan22", testLessThanGreaterThan22),
+        ("testLessThanGreaterThan23", testLessThanGreaterThan23),
+        ("testLessThanGreaterThan24", testLessThanGreaterThan24),
+        ("testLessThanGreaterThan25", testLessThanGreaterThan25),
+        ("testLessThanGreaterThan26", testLessThanGreaterThan26),
+        ("testLessThanGreaterThan27", testLessThanGreaterThan27),
+        ("testLessThanGreaterThan28", testLessThanGreaterThan28),
+    ]
+}
+
+final class TernaryOperators: XCTestCase {
+
+    func testTernaryConditional1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true ? 5 : 0
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true ? 5 : 0
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return false ? 5 : 0
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return false ? 5 : 0
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return false ? 5 : (false ? 5 : 0)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return false ? 5 : (false ? 5 : 0)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return false ? 5 : (true ? 5 : 0)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return false ? 5 : (true ? 5 : 0)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true ? 5 : (true ? 5 : 0)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true ? 5 : (true ? 5 : 0)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true ? 5 : (false ? 5 : 0)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true ? 5 : (false ? 5 : 0)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional7() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true ? (false ? 5 : 0) : (false ? 5 : 0)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true ? (false ? 5 : 0) : (false ? 5 : 0)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testTernaryConditional8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true ? (true ? 5 : 0) : (false ? 5 : 0)
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true ? (true ? 5 : 0) : (false ? 5 : 0)
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testTernaryConditional1", testTernaryConditional1),
+        ("testTernaryConditional2", testTernaryConditional2),
+        ("testTernaryConditional3", testTernaryConditional3),
+        ("testTernaryConditional4", testTernaryConditional4),
+        ("testTernaryConditional5", testTernaryConditional5),
+        ("testTernaryConditional6", testTernaryConditional6),
+        ("testTernaryConditional7", testTernaryConditional7),
+        ("testTernaryConditional8", testTernaryConditional8),
+    ]
+}
+
+final class Array: XCTestCase {
+
+    func testArrayCombineStressTest() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [1]
+            }
+            var test = makeArray()
+            test.append(contentsOf: makeArray())
+            test.append(contentsOf: makeArray())
+            test = test + makeArray()
+            let x = test[2] + test[3]
+            let y = test[0] + test[1]
+            return x + y
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func makeArray() -> [Int] {
+                return [1]
+            }
+            var test = makeArray()
+            test.append(contentsOf: makeArray())
+            test.append(contentsOf: makeArray())
+            test = test + makeArray()
+            let x = test[2] + test[3]
+            let y = test[0] + test[1]
+            return x + y
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = arr + [3]
+            return arr2[2]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = arr + [3]
+            return arr2[2]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = arr + [3,4]
+            return arr2[3]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = arr + [3,4]
+            return arr2[3]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + arr2
+            return arr3[3]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + arr2
+            return arr3[3]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[3]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[3]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[2]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[2]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[1]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[1]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins7() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[0]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1]]
+            return arr3[0]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1] + 5]
+            return arr3[3]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0], arr2[1] + 5]
+            return arr3[3]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArrayJoins9() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0] + arr[1], arr2[1] - 5]
+            return arr3[3]
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let arr = [1,2]
+            let arr2 = [3,4]
+            let arr3 = arr + [arr2[0] + arr[1], arr2[1] - 5]
+            return arr3[3]
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArray1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return [1][0]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return [1][0]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArray2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = [1]
+            let y = x[0]
+            return y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = [1]
+            let y = x[0]
+            return y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArray3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = [1]
+            let y = x[0] + x[0]
+            return y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = [1]
+            let y = x[0] + x[0]
+            return y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArray4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = [1, 2]
+            let y = x[x[0]] + x[0]
+            return y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = [1, 2]
+            let y = x[x[0]] + x[0]
+            return y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArray5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = ["test"]
+            let y = x[0]
+            let z = [y]
+            return z[0]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = ["test"]
+            let y = x[0]
+            let z = [y]
+            return z[0]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleArray6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let msgArray = ["hello","world"]
+            let msgString = msgArray[0] + msgArray[1]
+            return msgString
+            
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let msgArray = ["hello","world"]
+            let msgString = msgArray[0] + msgArray[1]
+            return msgString
+            
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testArrayAppend1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var test = [0]
+            test.append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            var test = [0]
+            test.append(1)
+            return test[1]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testArrayAppend2() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let test = [0]
+            test.append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var test = [0].append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend4() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let test = [0].append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            let test = makeArray().append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend6() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            var test = makeArray().append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend7() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            let test = makeArray()
+            test.append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            var test = makeArray()
+            test.append(1)
+            return test[1]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            var test = makeArray()
+            test.append(1)
+            return test[1]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testArrayAppend9() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var test = [0]
+            test.append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            var test = [0]
+            test.append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testArrayAppend10() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let test = [0]
+            test.append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend11() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var test = [0].append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend12() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let test = [0].append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend13() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            let test = makeArray().append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend14() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            var test = makeArray().append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend15() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            let test = makeArray()
+            test.append(contentsOf: [1,2])
+            return test[2]
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testArrayAppend16() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            var test = makeArray()
+            test.append(contentsOf: [1,2])
+            return test[2]
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func makeArray() -> [Int] {
+                return [0]
+            }
+            var test = makeArray()
+            test.append(contentsOf: [1,2])
+            return test[2]
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testArrayCopyByValue1() throws {
         let interpretedReturnResult = try interpretFromString("""
             //
             // start interpreted section
@@ -74,7 +2878,7 @@ final class Example: XCTestCase {
         XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
     }
 
-    func testAnotherOne2() throws {
+    func testArrayCopyByValue2() throws {
         let interpretedReturnResult = try interpretFromString("""
             //
             // start interpreted section
@@ -109,8 +2913,4518 @@ final class Example: XCTestCase {
     }
 
     static var allTests = [
-        ("testSomething", testSomething),
-        ("testAnotherOne1", testAnotherOne1),
-        ("testAnotherOne2", testAnotherOne2),
+        ("testArrayCombineStressTest", testArrayCombineStressTest),
+        ("testSimpleArrayJoins1", testSimpleArrayJoins1),
+        ("testSimpleArrayJoins2", testSimpleArrayJoins2),
+        ("testSimpleArrayJoins3", testSimpleArrayJoins3),
+        ("testSimpleArrayJoins4", testSimpleArrayJoins4),
+        ("testSimpleArrayJoins5", testSimpleArrayJoins5),
+        ("testSimpleArrayJoins6", testSimpleArrayJoins6),
+        ("testSimpleArrayJoins7", testSimpleArrayJoins7),
+        ("testSimpleArrayJoins8", testSimpleArrayJoins8),
+        ("testSimpleArrayJoins9", testSimpleArrayJoins9),
+        ("testSimpleArray1", testSimpleArray1),
+        ("testSimpleArray2", testSimpleArray2),
+        ("testSimpleArray3", testSimpleArray3),
+        ("testSimpleArray4", testSimpleArray4),
+        ("testSimpleArray5", testSimpleArray5),
+        ("testSimpleArray6", testSimpleArray6),
+        ("testArrayAppend1", testArrayAppend1),
+        ("testArrayAppend2", testArrayAppend2),
+        ("testArrayAppend3", testArrayAppend3),
+        ("testArrayAppend4", testArrayAppend4),
+        ("testArrayAppend5", testArrayAppend5),
+        ("testArrayAppend6", testArrayAppend6),
+        ("testArrayAppend7", testArrayAppend7),
+        ("testArrayAppend8", testArrayAppend8),
+        ("testArrayAppend9", testArrayAppend9),
+        ("testArrayAppend10", testArrayAppend10),
+        ("testArrayAppend11", testArrayAppend11),
+        ("testArrayAppend12", testArrayAppend12),
+        ("testArrayAppend13", testArrayAppend13),
+        ("testArrayAppend14", testArrayAppend14),
+        ("testArrayAppend15", testArrayAppend15),
+        ("testArrayAppend16", testArrayAppend16),
+        ("testArrayCopyByValue1", testArrayCopyByValue1),
+        ("testArrayCopyByValue2", testArrayCopyByValue2),
+    ]
+}
+
+final class Recursion: XCTestCase {
+
+    func testSimpleRecursion1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func factorial(of num: Int) -> Int {
+                if num == 1 {
+                    return 1
+                } else {
+                    let val = num - 1
+                    return num * factorial(of:val)
+                }
+            }
+            //let x = 12
+            let x = 3
+            let result = factorial(of: x)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func factorial(of num: Int) -> Int {
+                if num == 1 {
+                    return 1
+                } else {
+                    let val = num - 1
+                    return num * factorial(of:val)
+                }
+            }
+            //let x = 12
+            let x = 3
+            let result = factorial(of: x)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleRecursion2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func fibonacci(inNum i: Int) -> Int {
+                if i <= 2 {
+                    return 1
+                } else {
+                    return fibonacci(inNum: i - 1) + fibonacci(inNum: i - 2)
+                }
+            }
+            //let x = 12
+            let x = 3
+            let result = fibonacci(inNum: x)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func fibonacci(inNum i: Int) -> Int {
+                if i <= 2 {
+                    return 1
+                } else {
+                    return fibonacci(inNum: i - 1) + fibonacci(inNum: i - 2)
+                }
+            }
+            //let x = 12
+            let x = 3
+            let result = fibonacci(inNum: x)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleRecursion3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            //func digits(_ number: Int) -> [Int] {
+            //    if number >= 10 {
+            //        let firstDigits = digits(number / 10)
+            //        let lastDigit = number % 10
+            //        return firstDigits + [lastDigit]
+            //    } else {
+            //        return [number]
+            //    }
+            //}
+            //
+            //let x = 192831
+            //let result = digits(x)
+            // todo: after array support
+            let result = true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            //func digits(_ number: Int) -> [Int] {
+            //    if number >= 10 {
+            //        let firstDigits = digits(number / 10)
+            //        let lastDigit = number % 10
+            //        return firstDigits + [lastDigit]
+            //    } else {
+            //        return [number]
+            //    }
+            //}
+            //
+            //let x = 192831
+            //let result = digits(x)
+            // todo: after array support
+            let result = true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleRecursion4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func pow(_ x: Int, _ y: Int) -> Int {
+                if y == 0 {
+                    return 1
+                } else {
+                    if y == 1 {
+                        return x
+                    } else {
+                        // compute x^(y/2)
+                        let xy2 = pow(x, y / 2)
+                        // if y is even
+                        let modResult = y % 2
+                        if modResult == 0 {
+                            // x^y is x^(y/2) squared
+                            return xy2 * xy2
+                        } else {
+                            // x^y is x^(y/2) squared times x
+                            let val = xy2 * xy2
+                            return val * x
+                        }
+                    }
+                }
+            }
+            let result = pow(3,2)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func pow(_ x: Int, _ y: Int) -> Int {
+                if y == 0 {
+                    return 1
+                } else {
+                    if y == 1 {
+                        return x
+                    } else {
+                        // compute x^(y/2)
+                        let xy2 = pow(x, y / 2)
+                        // if y is even
+                        let modResult = y % 2
+                        if modResult == 0 {
+                            // x^y is x^(y/2) squared
+                            return xy2 * xy2
+                        } else {
+                            // x^y is x^(y/2) squared times x
+                            let val = xy2 * xy2
+                            return val * x
+                        }
+                    }
+                }
+            }
+            let result = pow(3,2)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleRecursion5() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func gcd(_ a: Int, _ b: Int) -> Int {
+                if b == 0 {
+                    return a
+                } else {
+                    if a > b {
+                        return gcd(a-b, b)
+                    } else {
+                        return gcd(a, b-a)
+                    }
+                }
+            }
+            let result = gcd(30, 75)
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func gcd(_ a: Int, _ b: Int) -> Int {
+                if b == 0 {
+                    return a
+                } else {
+                    if a > b {
+                        return gcd(a-b, b)
+                    } else {
+                        return gcd(a, b-a)
+                    }
+                }
+            }
+            let result = gcd(30, 75)
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testSimpleRecursion1", testSimpleRecursion1),
+        ("testSimpleRecursion2", testSimpleRecursion2),
+        ("testSimpleRecursion3", testSimpleRecursion3),
+        ("testSimpleRecursion4", testSimpleRecursion4),
+        ("testSimpleRecursion5", testSimpleRecursion5),
+    ]
+}
+
+final class FunctionalProgramming: XCTestCase {
+
+    func testFirstClassFunction1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func testFunc() -> Int {
+                return 5
+            }
+            let testFunc2 = testFunc
+            return testFunc2()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func testFunc() -> Int {
+                return 5
+            }
+            let testFunc2 = testFunc
+            return testFunc2()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testFirstClassFunction2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func testFunc() -> Int {
+                return 5
+            }
+            func testFunc2(_ otherFunc: () -> Int) -> Int {
+                return otherFunc()
+            }
+            return testFunc2(testFunc)
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func testFunc() -> Int {
+                return 5
+            }
+            func testFunc2(_ otherFunc: () -> Int) -> Int {
+                return otherFunc()
+            }
+            return testFunc2(testFunc)
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testFirstClassFunction1", testFirstClassFunction1),
+        ("testFirstClassFunction2", testFirstClassFunction2),
+    ]
+}
+
+final class Extensions: XCTestCase {
+
+    func testSimpleExtension1() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return "hello".append(" world!")
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleExtension2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            //extension Array {
+            //    func double() {
+            //        return self + self
+            //    }
+            //}
+            //return [1,2,3].double()
+            return "todo, we need to have a test which only tests the compiler in a global space"
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            //extension Array {
+            //    func double() {
+            //        return self + self
+            //    }
+            //}
+            //return [1,2,3].double()
+            return "todo, we need to have a test which only tests the compiler in a global space"
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleExtension3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return [1,2,3].double()
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleExtension4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            //extension Array {
+            //    func double() {
+            //        return self + self
+            //    }
+            //}
+            //return ["text"].double()
+            return "todo, we need to have a test which only tests the compiler in a global space"
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            //extension Array {
+            //    func double() {
+            //        return self + self
+            //    }
+            //}
+            //return ["text"].double()
+            return "todo, we need to have a test which only tests the compiler in a global space"
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleExtension5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return ["text"].double()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testSimpleExtension1", testSimpleExtension1),
+        ("testSimpleExtension2", testSimpleExtension2),
+        ("testSimpleExtension3", testSimpleExtension3),
+        ("testSimpleExtension4", testSimpleExtension4),
+        ("testSimpleExtension5", testSimpleExtension5),
+    ]
+}
+
+final class SimpleFunctionCallToPassValues: XCTestCase {
+
+    func testSimpleFunctionCallToPassValues1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> Int {
+                let x = 5
+                return x
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() -> Int {
+                let x = 5
+                return x
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallToPassValues2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getY() -> Int {
+                let y = 5
+                return y
+            }
+            func test() -> Int {
+                let x = getY()
+                return x
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getY() -> Int {
+                let y = 5
+                return y
+            }
+            func test() -> Int {
+                let x = getY()
+                return x
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallToPassValues3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let y = 5
+            func getY() -> Int {
+                return y
+            }
+            func test() -> Int {
+                let x = getY()
+                return x
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let y = 5
+            func getY() -> Int {
+                return y
+            }
+            func test() -> Int {
+                let x = getY()
+                return x
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallToPassValues4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let y = 5
+            func getY() -> Int {
+                func getZ() -> Int {
+                    let z = 5
+                    return z
+                }
+                return y + getZ()
+            }
+            func test() -> Int {
+                let x = getY()
+                return x
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let y = 5
+            func getY() -> Int {
+                func getZ() -> Int {
+                    let z = 5
+                    return z
+                }
+                return y + getZ()
+            }
+            func test() -> Int {
+                let x = getY()
+                return x
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallToPassValues5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let y = 5
+            func getY() -> Int {
+                func getZ() -> Int {
+                    let z = 5
+                    return z
+                }
+                return y + getZ()
+            }
+            func test() -> Int {
+                let x = getY() + getZ()
+                return x
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleFunctionCallToPassValues6() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let y = 5
+            func getY() -> Int {
+                func getZ() -> Int {
+                    let z = 5
+                    return z
+                }
+                return y + getZ()
+            }
+            return getZ()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testSimpleFunctionCallToPassValues1", testSimpleFunctionCallToPassValues1),
+        ("testSimpleFunctionCallToPassValues2", testSimpleFunctionCallToPassValues2),
+        ("testSimpleFunctionCallToPassValues3", testSimpleFunctionCallToPassValues3),
+        ("testSimpleFunctionCallToPassValues4", testSimpleFunctionCallToPassValues4),
+        ("testSimpleFunctionCallToPassValues5", testSimpleFunctionCallToPassValues5),
+        ("testSimpleFunctionCallToPassValues6", testSimpleFunctionCallToPassValues6),
+    ]
+}
+
+final class Equality: XCTestCase {
+
+    func testLessObviousEquality1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return () == ()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return () == ()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return () == Void()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return () == Void()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return Void() == ()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return Void() == ()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return Void() == Void()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return Void() == Void()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getNothing() {}
+            return getNothing() == Void()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getNothing() {}
+            return getNothing() == Void()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getNothing() -> Void {}
+            return getNothing() == Void()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getNothing() -> Void {}
+            return getNothing() == Void()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality7() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getNothing() -> () {}
+            return getNothing() == Void()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getNothing() -> () {}
+            return getNothing() == Void()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getNothing() {}
+            return Void() == getNothing()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getNothing() {}
+            return Void() == getNothing()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality9() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getNothing() -> Void {}
+            return Void() == getNothing()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getNothing() -> Void {}
+            return Void() == getNothing()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testLessObviousEquality10() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func getNothing() -> () {}
+            return Void() == getNothing()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func getNothing() -> () {}
+            return Void() == getNothing()
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 == 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 == 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 != 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 != 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true == true
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true == true
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return true != false
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return true != false
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return false == false
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return false == false
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return false != false
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return false != false
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality7() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return false != false
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return false != false
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5.5
+            let y = 5.5
+            return x != y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5.5
+            let y = 5.5
+            return x != y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality9() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5.5
+            let y = 5.5
+            return x == y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5.5
+            let y = 5.5
+            return x == y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality10() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5.5
+            let y = 5
+            return x == y
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testBasicEquality11() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = 5.5
+            return x == y
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testBasicEquality12() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = 5.5
+            return x != y
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testBasicEquality13() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 == 5.5
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testBasicEquality14() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 != 5.5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 != 5.5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality15() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5.5 == 5
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testBasicEquality16() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5.0 != 5
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5.0 != 5
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality17() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return "hi" == "hi"
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return "hi" == "hi"
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality18() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return "hi" != "hi"
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return "hi" != "hi"
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality19() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return "hi" == "bye"
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return "hi" == "bye"
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality20() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return "hi" != "bye"
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return "hi" != "bye"
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBasicEquality21() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() {
+                return 5
+            }
+            let x = test()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testLessObviousEquality1", testLessObviousEquality1),
+        ("testLessObviousEquality2", testLessObviousEquality2),
+        ("testLessObviousEquality3", testLessObviousEquality3),
+        ("testLessObviousEquality4", testLessObviousEquality4),
+        ("testLessObviousEquality5", testLessObviousEquality5),
+        ("testLessObviousEquality6", testLessObviousEquality6),
+        ("testLessObviousEquality7", testLessObviousEquality7),
+        ("testLessObviousEquality8", testLessObviousEquality8),
+        ("testLessObviousEquality9", testLessObviousEquality9),
+        ("testLessObviousEquality10", testLessObviousEquality10),
+        ("testBasicEquality1", testBasicEquality1),
+        ("testBasicEquality2", testBasicEquality2),
+        ("testBasicEquality3", testBasicEquality3),
+        ("testBasicEquality4", testBasicEquality4),
+        ("testBasicEquality5", testBasicEquality5),
+        ("testBasicEquality6", testBasicEquality6),
+        ("testBasicEquality7", testBasicEquality7),
+        ("testBasicEquality8", testBasicEquality8),
+        ("testBasicEquality9", testBasicEquality9),
+        ("testBasicEquality10", testBasicEquality10),
+        ("testBasicEquality11", testBasicEquality11),
+        ("testBasicEquality12", testBasicEquality12),
+        ("testBasicEquality13", testBasicEquality13),
+        ("testBasicEquality14", testBasicEquality14),
+        ("testBasicEquality15", testBasicEquality15),
+        ("testBasicEquality16", testBasicEquality16),
+        ("testBasicEquality17", testBasicEquality17),
+        ("testBasicEquality18", testBasicEquality18),
+        ("testBasicEquality19", testBasicEquality19),
+        ("testBasicEquality20", testBasicEquality20),
+        ("testBasicEquality21", testBasicEquality21),
+    ]
+}
+
+final class DeclarationOrder: XCTestCase {
+
+    func testVariableDeclarationOrder1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 4
+            let result = x + 5
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = 4
+            let result = x + 5
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testVariableDeclarationOrder2() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let result = x + 5
+            let x = 4
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testVariableDeclarationOrder3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var i = 0
+            while i < 3 {
+                i = i + 1
+                var j = 0
+                while j < 3 {
+                    j = j + 1
+                }
+            }
+            return i
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            var i = 0
+            while i < 3 {
+                i = i + 1
+                var j = 0
+                while j < 3 {
+                    j = j + 1
+                }
+            }
+            return i
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testFunctionDeclarationOrder1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> Int {
+                return 5
+            }
+            let result = test()
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func test() -> Int {
+                return 5
+            }
+            let result = test()
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testFunctionDeclarationOrder2() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func withinFunc() -> Int {
+                let result = test()
+                func test() -> Int {
+                    return 5
+                }
+                return result
+            }
+            withinFunc()
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testFunctionDeclarationOrder3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func withinFunc() -> Int {
+                func test() -> Int {
+                    return 5
+                }
+                let test2 = test()
+                return test2
+            }
+            let result = withinFunc()
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func withinFunc() -> Int {
+                func test() -> Int {
+                    return 5
+                }
+                let test2 = test()
+                return test2
+            }
+            let result = withinFunc()
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testVariableDeclarationOrder1", testVariableDeclarationOrder1),
+        ("testVariableDeclarationOrder2", testVariableDeclarationOrder2),
+        ("testVariableDeclarationOrder3", testVariableDeclarationOrder3),
+        ("testFunctionDeclarationOrder1", testFunctionDeclarationOrder1),
+        ("testFunctionDeclarationOrder2", testFunctionDeclarationOrder2),
+        ("testFunctionDeclarationOrder3", testFunctionDeclarationOrder3),
+    ]
+}
+
+final class Boolean: XCTestCase {
+
+    func testBooleanWhileLoop() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var val: Bool = true
+            var i: Int = 0
+            while (val == true) {
+                i  = i + 1
+                if(i >= 10){
+                    //print("done!")
+                    val = false
+                    //break
+                } else {
+                    //print("bruh")
+                }
+            }
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var val: Bool = true
+            var i: Int = 0
+            while (val == true) {
+                i  = i + 1
+                if(i >= 10){
+                    //print("done!")
+                    val = false
+                    //break
+                } else {
+                    //print("bruh")
+                }
+            }
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = i
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("i") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanAssignment1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanAssignment2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanAssignment3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false
+            let result = x
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false
+            let result = x
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanAssignment4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true
+            let result = x
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true
+            let result = x
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true || false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true || false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false || false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false || false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false || false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false || false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true || true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true || true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic5() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true && false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true && false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic6() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false && false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false && false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic7() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false && false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false && false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic8() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true && true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true && true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic9() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true == true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true == true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic10() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true != true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true != true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic11() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false == true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false == true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic12() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false != true
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false != true
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic13() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true == false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true == false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic14() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true != false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = true != false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic15() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false == false
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false == false
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBooleanLogic16() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false != false
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x = false != false
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testBooleanWhileLoop", testBooleanWhileLoop),
+        ("testBooleanAssignment1", testBooleanAssignment1),
+        ("testBooleanAssignment2", testBooleanAssignment2),
+        ("testBooleanAssignment3", testBooleanAssignment3),
+        ("testBooleanAssignment4", testBooleanAssignment4),
+        ("testBooleanLogic1", testBooleanLogic1),
+        ("testBooleanLogic2", testBooleanLogic2),
+        ("testBooleanLogic3", testBooleanLogic3),
+        ("testBooleanLogic4", testBooleanLogic4),
+        ("testBooleanLogic5", testBooleanLogic5),
+        ("testBooleanLogic6", testBooleanLogic6),
+        ("testBooleanLogic7", testBooleanLogic7),
+        ("testBooleanLogic8", testBooleanLogic8),
+        ("testBooleanLogic9", testBooleanLogic9),
+        ("testBooleanLogic10", testBooleanLogic10),
+        ("testBooleanLogic11", testBooleanLogic11),
+        ("testBooleanLogic12", testBooleanLogic12),
+        ("testBooleanLogic13", testBooleanLogic13),
+        ("testBooleanLogic14", testBooleanLogic14),
+        ("testBooleanLogic15", testBooleanLogic15),
+        ("testBooleanLogic16", testBooleanLogic16),
+    ]
+}
+
+final class StressTest: XCTestCase {
+
+    func testDeepNest1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {return true}}}}}}}}}}}};return false
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {return true}}}}}}}}}}}};return false
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testDeepNest2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            // these tests tend to break Xcode, but we should enable them every now and then to make sure the interpreter doesn't have a stack overflow. these have passed in the past
+            //if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {return true}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            return false
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            // these tests tend to break Xcode, but we should enable them every now and then to make sure the interpreter doesn't have a stack overflow. these have passed in the past
+            //if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {return true}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            return false
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testDeepNest3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            // these tests tend to break Xcode, but we should enable them every now and then to make sure the interpreter doesn't have a stack overflow. these have passed in the past
+            //if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {return true}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            return false
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            // these tests tend to break Xcode, but we should enable them every now and then to make sure the interpreter doesn't have a stack overflow. these have passed in the past
+            //if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {if true {return true}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            return false
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBigLoop1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var i = 0
+            while i < 10000 {
+                i = i + 1
+            }
+            return i
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            var i = 0
+            while i < 10000 {
+                i = i + 1
+            }
+            return i
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testBigLoop2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var i = 0
+            while i < 10000 {
+                i = i + 1
+                var j = 0
+                while j < 10 {
+                    j = j + 1
+                }
+            }
+            return i
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            var i = 0
+            while i < 10000 {
+                i = i + 1
+                var j = 0
+                while j < 10 {
+                    j = j + 1
+                }
+            }
+            return i
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testDeepNest1", testDeepNest1),
+        ("testDeepNest2", testDeepNest2),
+        ("testDeepNest3", testDeepNest3),
+        ("testBigLoop1", testBigLoop1),
+        ("testBigLoop2", testBigLoop2),
+    ]
+}
+
+final class SortingFunction: XCTestCase {
+
+    func testBubbleSort() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            // possible source to use: https://github.com/raywenderlich/swift-algorithm-club/blob/master/Bubble%20Sort/MyPlayground.playground/Sources/BubbleSort.swift
+            // todo:
+            let result = false
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            // possible source to use: https://github.com/raywenderlich/swift-algorithm-club/blob/master/Bubble%20Sort/MyPlayground.playground/Sources/BubbleSort.swift
+            // todo:
+            let result = false
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testBubbleSort", testBubbleSort),
+    ]
+}
+
+final class Switch: XCTestCase {
+
+    func testSimpleSwitch1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 1
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 1
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 10
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 10
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1.0
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 1.0
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1.5
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 1.5
+            switch x {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch6() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 1
+            switch x {
+            case 1.0:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleSwitch7() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func x() -> Int {
+                return 1
+            }
+            switch x() {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func x() -> Int {
+                return 1
+            }
+            switch x() {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch8() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func x() -> Double {
+                return 1.0
+            }
+            switch x() {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func x() -> Double {
+                return 1.0
+            }
+            switch x() {
+            case 1:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleSwitch9() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func x() -> Int {
+                return 1
+            }
+            switch x() {
+            case 1.0:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleSwitch10() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func x() -> Double {
+                return 1
+            }
+            switch x() {
+            case 1.0:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func x() -> Double {
+                return 1
+            }
+            switch x() {
+            case 1.0:
+                return "hello"
+            default:
+                return "world"
+            }
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testSimpleSwitch1", testSimpleSwitch1),
+        ("testSimpleSwitch2", testSimpleSwitch2),
+        ("testSimpleSwitch3", testSimpleSwitch3),
+        ("testSimpleSwitch4", testSimpleSwitch4),
+        ("testSimpleSwitch5", testSimpleSwitch5),
+        ("testSimpleSwitch6", testSimpleSwitch6),
+        ("testSimpleSwitch7", testSimpleSwitch7),
+        ("testSimpleSwitch8", testSimpleSwitch8),
+        ("testSimpleSwitch9", testSimpleSwitch9),
+        ("testSimpleSwitch10", testSimpleSwitch10),
+    ]
+}
+
+final class SimpleFunctionCall: XCTestCase {
+
+    func testSimpleFunctionTypes1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> Void {
+                return
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() -> Void {
+                return
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionTypes2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> Void {}
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() -> Void {}
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionTypes3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> () {
+                return
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() -> () {
+                return
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionTypes4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> () {}
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() -> () {}
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionTypes5() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() {
+                return
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() {
+                return
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionTypes6() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() {}
+            return test()
+            
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() {}
+            return test()
+            
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCall1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> Int {
+                return 5
+            }
+            return test()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test() -> Int {
+                return 5
+            }
+            return test()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCall2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() -> Int {
+                return 5
+            }
+            let x = test()
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func test() -> Int {
+                return 5
+            }
+            let x = test()
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCall3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test() {
+                return 5
+            }
+            let x = test()
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleFunctionCallWithArguments1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test(_ x: Int) -> Int {
+                return x
+            }
+            return test(5)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test(_ x: Int) -> Int {
+                return x
+            }
+            return test(5)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallWithArguments2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test(x: Int) -> Int {
+                return x
+            }
+            return test(x: 5)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test(x: Int) -> Int {
+                return x
+            }
+            return test(x: 5)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallWithArguments3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test(inLabel outLabel: Int) -> Int {
+                return outLabel
+            }
+            return test(inLabel: 5)
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test(inLabel outLabel: Int) -> Int {
+                return outLabel
+            }
+            return test(inLabel: 5)
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleFunctionCallWithArguments4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func test(_ outLabel: Int) -> Int {
+                return outLabel
+            }
+            return test(5)
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            func test(_ outLabel: Int) -> Int {
+                return outLabel
+            }
+            return test(5)
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testSimpleFunctionTypes1", testSimpleFunctionTypes1),
+        ("testSimpleFunctionTypes2", testSimpleFunctionTypes2),
+        ("testSimpleFunctionTypes3", testSimpleFunctionTypes3),
+        ("testSimpleFunctionTypes4", testSimpleFunctionTypes4),
+        ("testSimpleFunctionTypes5", testSimpleFunctionTypes5),
+        ("testSimpleFunctionTypes6", testSimpleFunctionTypes6),
+        ("testSimpleFunctionCall1", testSimpleFunctionCall1),
+        ("testSimpleFunctionCall2", testSimpleFunctionCall2),
+        ("testSimpleFunctionCall3", testSimpleFunctionCall3),
+        ("testSimpleFunctionCallWithArguments1", testSimpleFunctionCallWithArguments1),
+        ("testSimpleFunctionCallWithArguments2", testSimpleFunctionCallWithArguments2),
+        ("testSimpleFunctionCallWithArguments3", testSimpleFunctionCallWithArguments3),
+        ("testSimpleFunctionCallWithArguments4", testSimpleFunctionCallWithArguments4),
+    ]
+}
+
+final class Loops: XCTestCase {
+
+    func testSimpleArrayLoops() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var arr = [0]
+            var i = 1
+            while i <= 10 {
+                i = i + 1
+                arr.append(i)
+            }
+            return arr[2] + arr[4]
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            var arr = [0]
+            var i = 1
+            while i <= 10 {
+                i = i + 1
+                arr.append(i)
+            }
+            return arr[2] + arr[4]
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleLoops1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var i = 1
+            while i <= 10 {
+                i = i + 1
+            }
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var i = 1
+            while i <= 10 {
+                i = i + 1
+            }
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = i
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("i") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleLoops2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var i = 1
+            repeat {
+                i = i + 1
+            } while i < 10
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var i = 1
+            repeat {
+                i = i + 1
+            } while i < 10
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = i
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("i") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testSimpleArrayLoops", testSimpleArrayLoops),
+        ("testSimpleLoops1", testSimpleLoops1),
+        ("testSimpleLoops2", testSimpleLoops2),
+    ]
+}
+
+final class Generic: XCTestCase {
+
+    func testDisallowMultipleConcreteTypesForAGeneric1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val1: T, _ val2: T) -> T {
+                return val1
+            }
+            let result = genericTest(1, 3)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val1: T, _ val2: T) -> T {
+                return val1
+            }
+            let result = genericTest(1, 3)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testDisallowMultipleConcreteTypesForAGeneric2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val1: T, _ val2: T) -> T {
+                return val1
+            }
+            let result = genericTest(1, 3.5)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val1: T, _ val2: T) -> T {
+                return val1
+            }
+            let result = genericTest(1, 3.5)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testDisallowMultipleConcreteTypesForAGeneric3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val1: T, _ val2: T) -> T {
+                return val1
+            }
+            let someInt = 1
+            let result = genericTest(someInt, 3.5)
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testDisallowMultipleConcreteTypesForAGeneric4() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: T, _ val3: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someDouble = 1.5
+            let someDouble2 = 1.5
+            let result = genericTest(someInt, someDouble, someDouble2)
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testDisallowMultipleConcreteTypesForAGeneric5() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: T, _ val3: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someInt2 = 1
+            let someDouble = 1.5
+            let result = genericTest(someInt, someInt2, someDouble)
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: T, _ val3: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someInt2 = 1
+            let someDouble = 1.5
+            let result = genericTest(someInt, someInt2, someDouble)
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testGenericFunc() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T: FloatingPoint>(_ val: T) -> T {
+                return val * val
+            }
+            let result = genericTest(3)
+            
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T: FloatingPoint>(_ val: T) -> T {
+                return val * val
+            }
+            let result = genericTest(3)
+            
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testAllowMultipleConcreteTypesForSepparateGenerics1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someDouble = 1.5
+            let result = genericTest(someInt, someDouble)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someDouble = 1.5
+            let result = genericTest(someInt, someDouble)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testAllowMultipleConcreteTypesForSepparateGenerics2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someDouble = 1.5
+            let result = genericTest(someDouble, someInt)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T, U>(_ val1: T, _ val2: U) -> T {
+                return val1
+            }
+            let someInt = 1
+            let someDouble = 1.5
+            let result = genericTest(someDouble, someInt)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testAllowMultipleConcreteTypesForSepparateGenerics3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val1: T, _ val2: U) -> T {
+                return val1
+            }
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleGeneric1() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest(_ val: T) -> T {
+                return val
+            }
+            let result = genericTest(3)
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleGeneric2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let result = genericTest("hello world")
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let result = genericTest("hello world")
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleGeneric3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let result = genericTest(5 + 2)
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let result = genericTest(5 + 2)
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleGeneric4() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5)
+            let val2 = genericTest(2)
+            let result = val1 + val2
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5)
+            let val2 = genericTest(2)
+            let result = val1 + val2
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleGeneric5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.5)
+            let val2 = genericTest(2)
+            let result = val1 + val2
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleGeneric6() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.5)
+            let val2 = genericTest(2.2)
+            let result = val1 + val2
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.5)
+            let val2 = genericTest(2.2)
+            let result = val1 + val2
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleGeneric7() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.0)
+            let val2 = genericTest(2.2)
+            let result = val1 + val2
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.0)
+            let val2 = genericTest(2.2)
+            let result = val1 + val2
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleGeneric8() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.0)
+            let result = val1 + 2.0
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5.0)
+            let result = val1 + 2.0
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = result
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("result") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleGeneric9() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            func genericTest<T>(_ val: T) -> T {
+                return val
+            }
+            let val1 = genericTest(5)
+            let result = val1 + 2.0
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testDisallowMultipleConcreteTypesForAGeneric1", testDisallowMultipleConcreteTypesForAGeneric1),
+        ("testDisallowMultipleConcreteTypesForAGeneric2", testDisallowMultipleConcreteTypesForAGeneric2),
+        ("testDisallowMultipleConcreteTypesForAGeneric3", testDisallowMultipleConcreteTypesForAGeneric3),
+        ("testDisallowMultipleConcreteTypesForAGeneric4", testDisallowMultipleConcreteTypesForAGeneric4),
+        ("testDisallowMultipleConcreteTypesForAGeneric5", testDisallowMultipleConcreteTypesForAGeneric5),
+        ("testGenericFunc", testGenericFunc),
+        ("testAllowMultipleConcreteTypesForSepparateGenerics1", testAllowMultipleConcreteTypesForSepparateGenerics1),
+        ("testAllowMultipleConcreteTypesForSepparateGenerics2", testAllowMultipleConcreteTypesForSepparateGenerics2),
+        ("testAllowMultipleConcreteTypesForSepparateGenerics3", testAllowMultipleConcreteTypesForSepparateGenerics3),
+        ("testSimpleGeneric1", testSimpleGeneric1),
+        ("testSimpleGeneric2", testSimpleGeneric2),
+        ("testSimpleGeneric3", testSimpleGeneric3),
+        ("testSimpleGeneric4", testSimpleGeneric4),
+        ("testSimpleGeneric5", testSimpleGeneric5),
+        ("testSimpleGeneric6", testSimpleGeneric6),
+        ("testSimpleGeneric7", testSimpleGeneric7),
+        ("testSimpleGeneric8", testSimpleGeneric8),
+        ("testSimpleGeneric9", testSimpleGeneric9),
+    ]
+}
+
+final class Closures: XCTestCase {
+
+    func testSimpleClosure() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: () -> Int = {
+                return 5
+            }
+            return x()
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x: () -> Int = {
+                return 5
+            }
+            return x()
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testSimpleClosure", testSimpleClosure),
+    ]
+}
+
+final class Import: XCTestCase {
+
+    func testSimpleImport() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let simpleImport1: CGFloat = 0
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testSimpleImport", testSimpleImport),
+    ]
+}
+
+final class UnaryOperators: XCTestCase {
+
+    func testUnaryMinus1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            return -x
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            return -x
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryMinus2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = -x
+            return y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            let y = -x
+            return y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryMinus3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = -x
+            return -y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            let y = -x
+            return -y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryMinus4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            return -(-x)
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            return -(-x)
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNotOperator1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = true
+            return !x
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = true
+            return !x
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNotOperator2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = false
+            return !x
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = false
+            return !x
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNotOperator3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return !true
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return !true
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNotOperator4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return !false
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return !false
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryPlus1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            return +x
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            return +x
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryPlus2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = +x
+            return y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            let y = +x
+            return y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryPlus3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = +x
+            return +y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            let y = +x
+            return +y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testUnaryPlus4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            return +(+x)
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5
+            return +(+x)
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testUnaryMinus1", testUnaryMinus1),
+        ("testUnaryMinus2", testUnaryMinus2),
+        ("testUnaryMinus3", testUnaryMinus3),
+        ("testUnaryMinus4", testUnaryMinus4),
+        ("testNotOperator1", testNotOperator1),
+        ("testNotOperator2", testNotOperator2),
+        ("testNotOperator3", testNotOperator3),
+        ("testNotOperator4", testNotOperator4),
+        ("testUnaryPlus1", testUnaryPlus1),
+        ("testUnaryPlus2", testUnaryPlus2),
+        ("testUnaryPlus3", testUnaryPlus3),
+        ("testUnaryPlus4", testUnaryPlus4),
+    ]
+}
+
+final class DeclareWithType: XCTestCase {
+
+    func testSimpleDeclareWithType1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Int = 5
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x: Int = 5
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleDeclareWithType2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Double = 5
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            let x: Double = 5
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleDeclareWithType3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Int = 5.5
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testSimpleDeclareWithType1", testSimpleDeclareWithType1),
+        ("testSimpleDeclareWithType2", testSimpleDeclareWithType2),
+        ("testSimpleDeclareWithType3", testSimpleDeclareWithType3),
     ]
 }

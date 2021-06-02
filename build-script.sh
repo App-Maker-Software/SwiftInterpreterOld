@@ -3,4 +3,4 @@ cd Tests/SwiftInterpreterTests
 cd ../..
 
 # for building from source env
-cp Tests/SwiftInterpreterTests/SwiftInterpreterAutomaticTests.swift ../SwiftInterpreterSourceTest/Tests/SwiftInterpreterTests/SwiftInterpreterAutomaticTests.swift
+cp Tests/SwiftInterpreterTests/SwiftInterpreterAutomaticTests.swift ../SwiftInterpreterSource/Tests/SwiftInterpreterTests/SwiftInterpreterAutomaticTests.swift
