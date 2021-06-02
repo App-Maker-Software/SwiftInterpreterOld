@@ -2,24 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "Files",
-        "repositoryURL": "https://github.com/johnsundell/files.git",
-        "state": {
-          "branch": null,
-          "revision": "d273b5b7025d386feef79ef6bad7de762e106eaf",
-          "version": "4.2.0"
-        }
-      },
-      {
-        "package": "SwiftAST",
-        "repositoryURL": "git@github.com:App-Maker-Software/FlatSwiftAST.git",
-        "state": {
-          "branch": null,
-          "revision": "dea0a7628b81a3cd977e06ed9086e7ac569e213b",
-          "version": "0.50400.0"
-        }
-      },
-      {
         "package": "SwiftSyntax",
         "repositoryURL": "https://github.com/apple/swift-syntax.git",
         "state": {
@@ -35,15 +17,6 @@
           "branch": null,
           "revision": "dff2c678332cd8873d9392aa0361a90cc68870ed",
           "version": "0.50400.0"
-        }
-      },
-      {
-        "package": "SwiftInterpreterSource",
-        "repositoryURL": "git@github.com:App-Maker-Software/SwiftInterpreterSource.git",
-        "state": {
-          "branch": "main",
-          "revision": "ca92435c35a81c015dd0ed44f010231c2b54b9e1",
-          "version": null
         }
       }
     ]

@@ -80,7 +80,6 @@ fileContents = """//
 //
 
 import XCTest
-@testable import SwiftInterpreter
 
 #if !canImport(ObjectiveC)
 final class SwiftInterpreterAutomaticTests {

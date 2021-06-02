@@ -1,4 +1,3 @@
-import Foundation
 import SwiftInterpreterBinary
 
 public func interpret(_ astData: [UInt8]) throws -> Any {
