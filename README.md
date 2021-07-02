@@ -71,15 +71,13 @@ To build from source, first clone [SwiftInterpreterSource](https://github.com/Ap
 
 <img width="330" alt="image" src="https://user-images.githubusercontent.com/8505851/120383244-e4622700-c2e1-11eb-84b5-8ac140bc45fa.png">
 
-Then run `export BUILD_SWIFT_INTERPRETER_FROM_SOURCE=1;swift package generate-xcodeproj` to produce `SwiftInterpreter.xcodeproj`.
+Then run `swift package generate-xcodeproj` to produce `SwiftInterpreter.xcodeproj`.
 
 Then drag the `SwiftInterpreterSource` folder into the navigation panel of SwiftInterpreter. This should prompt asking to create a workspace. Create the workspace under the `SwiftInterpreter` folder and call it `SwiftInterpreter.xcworkspace`.
 
 <img width="781" alt="image" src="https://user-images.githubusercontent.com/8505851/120383455-212e1e00-c2e2-11eb-9b9f-76842b8d75b1.png">
 
-Open the workspace and edit the `SwiftInterpreter-Package` schema. Set an environment variable called `BUILD_SWIFT_INTERPRETER_FROM_SOURCE` to `1`.
-
-<img width="1172" alt="image" src="https://user-images.githubusercontent.com/8505851/120383532-373bde80-c2e2-11eb-9be5-40e6336cf761.png">
+Rewrite the target `SwiftInterpreterSource` to have the name `SwiftInterpreterBinary` in order to trick this repo into using the source instead of the binary target.
 
 Now when you build, it will automatically build the Swift Interpreter from source and use that in your tests.
 

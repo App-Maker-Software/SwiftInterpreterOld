@@ -2,6 +2,42 @@
   "object": {
     "pins": [
       {
+        "package": "Files",
+        "repositoryURL": "https://github.com/johnsundell/files.git",
+        "state": {
+          "branch": null,
+          "revision": "d273b5b7025d386feef79ef6bad7de762e106eaf",
+          "version": "4.2.0"
+        }
+      },
+      {
+        "package": "SwiftAST",
+        "repositoryURL": "git@github.com:App-Maker-Software/FlatSwiftAST.git",
+        "state": {
+          "branch": null,
+          "revision": "4ff2157d57d616502e0d307e9dc37981a808bb2a",
+          "version": "0.50400.0"
+        }
+      },
+      {
+        "package": "ProjectSyncPackage",
+        "repositoryURL": "git@github.com:App-Maker-Software/ProjectSync",
+        "state": {
+          "branch": "main",
+          "revision": "7d13a35210dc1208a8c0a14a20be9d35a71f3950",
+          "version": null
+        }
+      },
+      {
+        "package": "SocketSwift",
+        "repositoryURL": "https://github.com/BiAtoms/Socket.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "36911c13adfe12859ed43dcba878052b1897fcd3",
+          "version": "2.4.0"
+        }
+      },
+      {
         "package": "SwiftSyntax",
         "repositoryURL": "https://github.com/apple/swift-syntax.git",
         "state": {
@@ -17,6 +53,15 @@
           "branch": null,
           "revision": "dff2c678332cd8873d9392aa0361a90cc68870ed",
           "version": "0.50400.0"
+        }
+      },
+      {
+        "package": "SwiftInterpreterSource",
+        "repositoryURL": "git@github.com:App-Maker-Software/SwiftInterpreterSource.git",
+        "state": {
+          "branch": "main",
+          "revision": "4def3a970770ddab1057ef60afd5d09e814044d0",
+          "version": null
         }
       }
     ]
