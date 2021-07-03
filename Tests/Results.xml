@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
 <testsuite name="TestResults" errors="0" tests="247" failures="142" time="0.0">
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend15" time="0.0">
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend13" time="0.0">
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend15" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend14" time="0.0">
 <failure message="failed"></failure>
 </testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend13" time="0.0">
+<failure message="failed"></failure>
+</testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend16" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend12" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend10" time="0.0">
@@ -22,32 +25,31 @@
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend11" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend12" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend9" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend7" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend8" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend4" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend3" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend6" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend5" time="0.0">
 <failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend3" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend4" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend6" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend7" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend9" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayAppend8" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray2" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray3" time="0.0">
 </testcase>
@@ -55,20 +57,21 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray4" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray1" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray2" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayCopyByValue1" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testArrayCopyByValue2" time="0.0">
-<failure message="failed"></failure>
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray6" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testArrayCombineStressTest" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray6" time="0.0">
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArray1" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayCopyByValue2" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testArrayCopyByValue1" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins3" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins1" time="0.0">
 <failure message="failed"></failure>
@@ -76,24 +79,13 @@
 <testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins3" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins4" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins6" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins5" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins7" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanAssignment3" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanAssignment2" time="0.0">
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins5" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanAssignment4" time="0.0">
 </testcase>
@@ -101,11 +93,17 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic11" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic13" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic12" time="0.0">
 </testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins7" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic13" time="0.0">
+</testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic14" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins6" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic15" time="0.0">
 </testcase>
@@ -115,11 +113,21 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic1" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic5" time="0.0">
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins8" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic4" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanAssignment1" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanAssignment2" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins9" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic3" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic4" time="0.0">
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic5" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic6" time="0.0">
 </testcase>
@@ -127,15 +135,11 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic8" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins9" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Array" name="testSimpleArrayJoins8" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanAssignment1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan10" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan11" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan12" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan14" time="0.0">
 </testcase>
@@ -145,60 +149,58 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan18" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic9" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanWhileLoop" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan19" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan10" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Closures" name="testSimpleClosure" time="0.0">
-<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan1" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan20" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan12" time="0.0">
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan22" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan23" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan24" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan26" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanWhileLoop" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Boolean" name="testBooleanLogic9" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Closures" name="testSimpleClosure" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan27" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan13" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan23" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan22" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan27" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan26" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan2" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan28" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan17" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan4" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan3" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan28" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan2" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan4" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan6" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan5" time="0.0">
 </testcase>
+<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan8" time="0.0">
+</testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan7" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan9" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan8" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan21" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan24" time="0.0">
+<testcase classname="SwiftInterpreterTests.DeclareWithType" name="testSimpleDeclareWithType1" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Comparisons" name="testLessThanGreaterThan25" time="0.0">
 <failure message="failed"></failure>
@@ -212,17 +214,15 @@
 <testcase classname="SwiftInterpreterTests.DeclarationOrder" name="testFunctionDeclarationOrder3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.DeclarationOrder" name="testVariableDeclarationOrder1" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.DeclarationOrder" name="testVariableDeclarationOrder2" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Encapsulation" name="testLocalVariables1" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.DeclarationOrder" name="testVariableDeclarationOrder3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.DeclareWithType" name="testSimpleDeclareWithType1" time="0.0">
+<testcase classname="SwiftInterpreterTests.DeclarationOrder" name="testVariableDeclarationOrder2" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.DeclarationOrder" name="testVariableDeclarationOrder1" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.DeclareWithType" name="testSimpleDeclareWithType2" time="0.0">
 <failure message="failed"></failure>
@@ -232,44 +232,41 @@
 <testcase classname="SwiftInterpreterTests.DeclareWithType" name="testSimpleDeclareWithType3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality16" time="0.0">
+</testcase>
 <testcase classname="SwiftInterpreterTests.Encapsulation" name="testLocalVariables2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality16" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality17" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality10" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Encapsulation" name="testLocalVariables3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality10" time="0.0">
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality18" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality1" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality19" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality20" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality2" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality3" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality4" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality12" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality11" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality18" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality19" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality12" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality13" time="0.0">
 <failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality20" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality1" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality2" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality15" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality3" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality4" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality5" time="0.0">
 </testcase>
@@ -277,12 +274,15 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality7" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality8" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality9" time="0.0">
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality15" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality21" time="0.0">
 <failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality9" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testBasicEquality8" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality10" time="0.0">
 <failure message="failed"></failure>
@@ -293,29 +293,29 @@
 <testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality4" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality3" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Extensions" name="testSimpleExtension2" time="0.0">
 </testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality4" time="0.0">
+<failure message="failed"></failure>
+</testcase>
 <testcase classname="SwiftInterpreterTests.Extensions" name="testSimpleExtension4" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality6" time="0.0">
+<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality5" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality8" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality7" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality9" time="0.0">
+<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality6" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality8" time="0.0">
+<testcase classname="SwiftInterpreterTests.Equality" name="testLessObviousEquality9" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Extensions" name="testSimpleExtension1" time="0.0">
@@ -324,19 +324,19 @@
 <testcase classname="SwiftInterpreterTests.Extensions" name="testSimpleExtension3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Extensions" name="testSimpleExtension5" time="0.0">
+<testcase classname="SwiftInterpreterTests.FunctionalProgramming" name="testFirstClassFunction1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.FunctionalProgramming" name="testFirstClassFunction1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Extensions" name="testSimpleExtension5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.FunctionalProgramming" name="testFirstClassFunction2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Generic" name="testAllowMultipleConcreteTypesForSepparateGenerics1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Generic" name="testAllowMultipleConcreteTypesForSepparateGenerics2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Generic" name="testAllowMultipleConcreteTypesForSepparateGenerics2" time="0.0">
+<testcase classname="SwiftInterpreterTests.Generic" name="testAllowMultipleConcreteTypesForSepparateGenerics1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Generic" name="testAllowMultipleConcreteTypesForSepparateGenerics3" time="0.0">
@@ -350,13 +350,10 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Generic" name="testSimpleGeneric3" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Generic" name="testDisallowMultipleConcreteTypesForAGeneric3" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.Generic" name="testDisallowMultipleConcreteTypesForAGeneric4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Generic" name="testDisallowMultipleConcreteTypesForAGeneric5" time="0.0">
+<testcase classname="SwiftInterpreterTests.Generic" name="testDisallowMultipleConcreteTypesForAGeneric3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Generic" name="testGenericFunc" time="0.0">
@@ -365,16 +362,19 @@
 <testcase classname="SwiftInterpreterTests.Generic" name="testSimpleGeneric1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
+<testcase classname="SwiftInterpreterTests.Generic" name="testDisallowMultipleConcreteTypesForAGeneric5" time="0.0">
+<failure message="failed"></failure>
+</testcase>
 <testcase classname="SwiftInterpreterTests.Generic" name="testSimpleGeneric2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Generic" name="testSimpleGeneric4" time="0.0">
-<failure message="failed"></failure>
+<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf2" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Generic" name="testSimpleGeneric5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf2" time="0.0">
+<testcase classname="SwiftInterpreterTests.Generic" name="testSimpleGeneric4" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf3" time="0.0">
 </testcase>
@@ -398,22 +398,19 @@
 <testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse2" time="0.0">
+<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf6" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIf5" time="0.0">
+<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse4" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse5" time="0.0">
+<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus1" time="0.0">
@@ -422,10 +419,13 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus3" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse6" time="0.0">
+<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus4" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse6" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.IfBlock" name="testSimpleIfElse7" time="0.0">
 <failure message="failed"></failure>
@@ -433,24 +433,24 @@
 <testcase classname="SwiftInterpreterTests.Import" name="testSimpleImport" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Loops" name="testSimpleLoops1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Loops" name="testSimpleArrayLoops" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Loops" name="testSimpleArrayLoops" time="0.0">
+<testcase classname="SwiftInterpreterTests.Loops" name="testSimpleLoops1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Loops" name="testSimpleLoops2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Recursion" name="testSimpleRecursion3" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus7" time="0.0">
-<failure message="failed"></failure>
+<testcase classname="SwiftInterpreterTests.Recursion" name="testSimpleRecursion3" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus6" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus7" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Modulus" name="testSimpleModulus8" time="0.0">
@@ -465,19 +465,19 @@
 <testcase classname="SwiftInterpreterTests.Recursion" name="testSimpleRecursion2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Recursion" name="testSimpleRecursion4" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionCall1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Recursion" name="testSimpleRecursion5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionCall3" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionCall1" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionCall2" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.Recursion" name="testSimpleRecursion4" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionCall3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionCallWithArguments1" time="0.0">
@@ -495,13 +495,13 @@
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes4" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes2" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes5" time="0.0">
@@ -509,44 +509,44 @@
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleString" name="testConcatenation" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleString" name="testStringAssignment" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testAddingToVariable1" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testAddingToVariable2" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes6" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues1" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCall" name="testSimpleFunctionTypes6" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
+<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testAddingToVariable1" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testAddingToVariable2" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.SimpleString" name="testStringAssignment" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testMultiplyingVariables1" time="0.0">
+</testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testMultiplyingVariables1" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testMultiplyingVariables2" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testMultiplyingVariables3" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues5" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.SortingFunction" name="testBubbleSort" time="0.0">
-</testcase>
-<testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues6" time="0.0">
-<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.StressTest" name="testDeepNest2" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.StressTest" name="testDeepNest3" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testMultiplyingVariables3" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues5" time="0.0">
+<failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testMultiplyingVariables2" time="0.0">
+<testcase classname="SwiftInterpreterTests.SimpleFunctionCallToPassValues" name="testSimpleFunctionCallToPassValues6" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.SimpleVariableChange" name="testPreventVariableShadowingFunction1" time="0.0">
 <failure message="failed"></failure>
@@ -566,56 +566,56 @@
 <testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch10" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch2" time="0.0">
+<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch1" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
+<testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional1" time="0.0">
+</testcase>
 <testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional1" time="0.0">
+<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch6" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional2" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional3" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional5" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional4" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch6" time="0.0">
-<failure message="failed"></failure>
-</testcase>
-<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch5" time="0.0">
-<failure message="failed"></failure>
-</testcase>
 <testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional6" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional5" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional7" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.TernaryOperators" name="testTernaryConditional8" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch7" time="0.0">
+<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch5" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testNotOperator1" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testNotOperator2" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testNotOperator3" time="0.0">
-</testcase>
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testNotOperator4" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testNotOperator3" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryMinus1" time="0.0">
 </testcase>
-<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryMinus2" time="0.0">
+<testcase classname="SwiftInterpreterTests.Switch" name="testSimpleSwitch7" time="0.0">
+<failure message="failed"></failure>
 </testcase>
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryMinus3" time="0.0">
+</testcase>
+<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryMinus2" time="0.0">
 </testcase>
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryMinus4" time="0.0">
 </testcase>
@@ -631,10 +631,10 @@
 <testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryPlus2" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryPlus3" time="0.0">
+<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryPlus4" time="0.0">
 <failure message="failed"></failure>
 </testcase>
-<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryPlus4" time="0.0">
+<testcase classname="SwiftInterpreterTests.UnaryOperators" name="testUnaryPlus3" time="0.0">
 <failure message="failed"></failure>
 </testcase>
 </testsuite>
