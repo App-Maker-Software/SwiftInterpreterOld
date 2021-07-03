@@ -16,7 +16,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterBinary"]),
-//        .target(name: "SwiftInterpreterSource", dependencies: ["SwiftInterpreterSource"]),
+//        .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
         .testTarget(
             name: "SwiftInterpreterTests",
             dependencies: [
@@ -31,6 +31,6 @@ let package = Package(
                 "build_automatic_tests.pyc"
             ]
         ),
-        .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.4.0/SwiftInterpreterBinary.xcframework.zip", checksum: "5ad9c363eb49941931c22b6a1f977e5ed1ee9ae7386584194a1d7c9d14875729")
+        .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.4.1/SwiftInterpreterBinary.xcframework.zip", checksum: "5603eea98a18a3f0b6844f92a95904e7d855e97043f07ff0fb4a9eaf116bb61b")
     ]
 )
