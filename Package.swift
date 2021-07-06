@@ -31,6 +31,6 @@ let package = Package(
                 "build_automatic_tests.pyc"
             ]
         ),
-        .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.4.1/SwiftInterpreterBinary.xcframework.zip", checksum: "ed63486b19736bc235aeedace5f94d5dd364c0dc6acd887828f6b295c3830ebc")
+        .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.4.2/SwiftInterpreterBinary.xcframework.zip", checksum: "ed63486b19736bc235aeedace5f94d5dd364c0dc6acd887828f6b295c3830ebc")
     ]
 )
