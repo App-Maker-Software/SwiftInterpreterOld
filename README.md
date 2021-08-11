@@ -81,4 +81,8 @@ Rewrite the target `SwiftInterpreterSource` to have the name `SwiftInterpreterBi
 
 Now when you build, it will automatically build the Swift Interpreter from source and use that in your tests.
 
+## XCFramework Stub
 
+There is a "stub" of the Swift Interpreter XCFramework which is simply an empty XCFramework. This existence of this stub is to allow for a hack for schema-tied dependencies in Swift Packages until conditional target dependencies is fully implemented in SPM. https://github.com/apple/swift-evolution/blob/main/proposals/0273-swiftpm-conditional-target-dependencies.md
+
+The hack works by having a build script swap out a hard link to either point to the real XCFramework or the stub depending on the selected scheme. i.e. "Debug" builds will have the hard link point to the real XCFramework, while "Release" builds will point to the stub. This will probably only be used by [LiveApp](http://github.com/App-Maker-Software/LiveApp). There we are wanting to use the interpreter to provide developer tools, but we don't want to change how production builds work. 
