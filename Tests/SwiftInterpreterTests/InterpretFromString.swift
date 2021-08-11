@@ -4,7 +4,7 @@
 //
 //  Created by Joseph Hinkle on 6/1/21.
 //
-
+#if canImport(SwiftInterpreterBinary) || canImport(SwiftInterpreterSource)
 import SwiftASTConstructor
 import SwiftInterpreter
 #if canImport(SwiftInterpreterBinary)
@@ -38,4 +38,4 @@ extension Optional {
         }
     }
 }
-
+#endif

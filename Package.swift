@@ -8,6 +8,10 @@ let package = Package(
         .library(
             name: "SwiftInterpreter",
             targets: ["SwiftInterpreter"]
+        ),
+        .library(
+            name: "SwiftInterpreterDebugOnly",
+            targets: ["SwiftInterpreterDebugOnly"]
         )
     ],
     dependencies: [
@@ -16,6 +20,11 @@ let package = Package(
     ],
     targets: [
         .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterBinary"]),
+        .target(
+            name: "SwiftInterpreterDebugOnly",
+//            dependencies: [.target(name: "SwiftInterpreterBinary", .when(configuration: .debug))], // does not work, awaiting spm support
+            linkerSettings: [.linkedFramework("SwiftInterpreterBinary", .when(configuration: .debug))] // relies on build script to embeded and sign the xcframework for debug builds
+        ),
 //        .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
         .testTarget(
             name: "SwiftInterpreterTests",
