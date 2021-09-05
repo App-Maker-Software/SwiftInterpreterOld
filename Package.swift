@@ -17,7 +17,7 @@ if gitBranch.contains("develop") {
 var dependencies: [Package.Dependency]!
 if BUILD_FROM_SOURCE {
     dependencies = [
-        .package(name: "SwiftInterpreterSource", url: "git@github.com:App-Maker-Software/SwiftInterpreterSource.git", .branch("main")),
+        .package(name: "SwiftInterpreterSource", path: "../SwiftInterpreterSource"),
     ]
 } else {
     dependencies = [
