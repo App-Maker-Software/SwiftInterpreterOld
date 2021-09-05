@@ -2,30 +2,49 @@
 import PackageDescription
 import Foundation
 
-let package = Package(
-    name: "SwiftInterpreter",
-    products: [
-        .library(
-            name: "SwiftInterpreter",
-            targets: ["SwiftInterpreter"]
-        ),
-        .library(
-            name: "SwiftInterpreterDebugOnly",
-            targets: ["SwiftInterpreterDebugOnly"]
-        )
-    ],
-    dependencies: [
+// depending on which branch we are on, we will declare different dependencies and targets
+let gitBranch = shell("git branch --show-current").trimmingCharacters(in: .newlines)
+
+// any git branch with "develop" in the dev will build from source
+var BUILD_FROM_SOURCE: Bool = false
+if gitBranch.contains("develop") {
+    BUILD_FROM_SOURCE = true
+} else {
+    BUILD_FROM_SOURCE = false
+}
+
+// Dependencies
+var dependencies: [Package.Dependency]!
+if BUILD_FROM_SOURCE {
+    dependencies = [
+        .package(name: "SwiftInterpreterSource", url: "git@github.com:App-Maker-Software/SwiftInterpreterSource.git", .branch("main")),
+    ]
+} else {
+    dependencies = [
         .package(name: "SwiftASTConstructor", url: "https://github.com/App-Maker-Software/SwiftASTConstructor.git", .exact("0.50400.0")),
-//        .package(name: "SwiftInterpreterSource", url: "git@github.com:App-Maker-Software/SwiftInterpreterSource.git", .branch("main")),
-    ],
-    targets: [
+    ]
+}
+
+// Targets
+var targets: [Target]!
+if BUILD_FROM_SOURCE {
+    targets = [
+        .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
+        .testTarget(
+            name: "SwiftInterpreterTests",
+            dependencies: ["SwiftInterpreter"],
+            exclude: [
+                "CodeTests/",
+                "quick_test.py",
+                "quick_test.pyc",
+                "build_automatic_tests.py",
+                "build_automatic_tests.pyc"
+            ]
+        )
+    ]
+} else {
+    targets = [
         .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterBinary"]),
-        .target(
-            name: "SwiftInterpreterDebugOnly",
-//            dependencies: [.target(name: "SwiftInterpreterBinary", .when(configuration: .debug))], // does not work, awaiting spm support
-            linkerSettings: [.linkedFramework("SwiftInterpreterBinary", .when(configuration: .debug))] // relies on build script to embeded and sign the xcframework for debug builds
-        ),
-//        .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
         .testTarget(
             name: "SwiftInterpreterTests",
             dependencies: [
@@ -42,4 +61,40 @@ let package = Package(
         ),
         .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.4.6/SwiftInterpreterBinary.xcframework.zip", checksum: "0caaff876afd62262ff3b6c99e1344c117771a9e4143e76282ada6c7e7b62d2f")
     ]
+}
+
+let package = Package(
+    name: "SwiftInterpreter",
+    products: [
+        .library(
+            name: "SwiftInterpreter",
+            targets: ["SwiftInterpreter"]
+        )
+    ],
+    dependencies: dependencies,
+    targets: targets
 )
+
+
+// utils
+// source: https://stackoverflow.com/a/50035059/3902590
+func rawShell(_ command: String) -> String {
+    let task = Process()
+    let pipe = Pipe()
+    
+    task.standardOutput = pipe
+    task.standardError = pipe
+    task.arguments = ["-c", command]
+    task.launchPath = "/bin/zsh"
+    task.launch()
+    
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = String(data: data, encoding: .utf8)!
+    
+    return output
+}
+// adds package path to the call
+func shell(_ command: String) -> String {
+    let thisPackageDir = URL(fileURLWithPath: #file).deletingLastPathComponent().path
+    return rawShell("cd \(thisPackageDir);\(command)")
+}
