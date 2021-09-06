@@ -18,49 +18,49 @@ var dependencies: [Package.Dependency]!
 if BUILD_FROM_SOURCE {
     dependencies = [
         .package(name: "SwiftInterpreterSource", path: "../SwiftInterpreterSource"),
+        .package(name: "SwiftASTConstructor", url: "https://github.com/App-Maker-Software/SwiftASTConstructor.git", .exact("0.50400.0")),
+        .package(name: "ViewInspector", url: "git@github.com:nalexn/ViewInspector.git", from: "0.8.1")
     ]
 } else {
     dependencies = [
         .package(name: "SwiftASTConstructor", url: "https://github.com/App-Maker-Software/SwiftASTConstructor.git", .exact("0.50400.0")),
+        .package(name: "ViewInspector", url: "git@github.com:nalexn/ViewInspector.git", from: "0.8.1")
     ]
 }
 
 // Targets
 var targets: [Target]!
+let testTargets: [Target] = [
+    .testTarget(
+        name: "SwiftInterpreterTests",
+        dependencies: [
+            "SwiftInterpreter",
+            .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
+        ],
+        exclude: [
+            "CodeTests/",
+            "quick_test.py",
+            "quick_test.pyc",
+            "build_automatic_tests.py",
+            "build_automatic_tests.pyc"
+        ]
+    ),
+    .testTarget(name: "SwiftUIInterpreterTests", dependencies: [
+        "SwiftInterpreter",
+        .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor"),
+        "ViewInspector"
+    ])
+
+]
 if BUILD_FROM_SOURCE {
     targets = [
         .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
-        .testTarget(
-            name: "SwiftInterpreterTests",
-            dependencies: ["SwiftInterpreter"],
-            exclude: [
-                "CodeTests/",
-                "quick_test.py",
-                "quick_test.pyc",
-                "build_automatic_tests.py",
-                "build_automatic_tests.pyc"
-            ]
-        )
-    ]
+    ] + testTargets
 } else {
     targets = [
         .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterBinary"]),
-        .testTarget(
-            name: "SwiftInterpreterTests",
-            dependencies: [
-                "SwiftInterpreter",
-                .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor")
-            ],
-            exclude: [
-                "CodeTests/",
-                "quick_test.py",
-                "quick_test.pyc",
-                "build_automatic_tests.py",
-                "build_automatic_tests.pyc"
-            ]
-        ),
         .binaryTarget(name: "SwiftInterpreterBinary", url: "https://github.com/App-Maker-Software/SwiftInterpreter/releases/download/0.4.6/SwiftInterpreterBinary.xcframework.zip", checksum: "0caaff876afd62262ff3b6c99e1344c117771a9e4143e76282ada6c7e7b62d2f")
-    ]
+    ] + testTargets
 }
 
 let package = Package(

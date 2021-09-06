@@ -4,8 +4,11 @@
 //
 //  Created by Joseph Hinkle on 6/1/21.
 //
-#if canImport(SwiftInterpreterBinary) || canImport(SwiftInterpreterSource)
 import SwiftASTConstructor
+#if canImport(SwiftAST)
+import SwiftAST
+#endif
+#if canImport(SwiftInterpreterBinary) || canImport(SwiftInterpreterSource)
 import SwiftInterpreter
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
@@ -21,7 +24,6 @@ func interpretFromString(_ code: String, using stack: Stack? = nil) throws -> An
         try! unlock_demo(liveAppBundle: nil, connectToHotRefreshServer: false)
         hasSetup = true
     }
-    
     let astData = [UInt8](try SwiftASTConstructor.constructAST(from: code))
     return try SwiftInterpreter.interpret(astData, using: stack)
 }
