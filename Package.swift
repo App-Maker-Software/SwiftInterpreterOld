@@ -13,6 +13,14 @@ if gitBranch.contains("develop") {
     BUILD_FROM_SOURCE = false
 }
 
+// swiftui support only for binary builds
+var SWIFTUI_SUPPORT: Bool = false
+if gitBranch.contains("binary") || gitBranch.contains("main") {
+    SWIFTUI_SUPPORT = true
+} else {
+    SWIFTUI_SUPPORT = false
+}
+
 // Dependencies
 var dependencies: [Package.Dependency]!
 if BUILD_FROM_SOURCE {
@@ -44,14 +52,12 @@ let testTargets: [Target] = [
             "build_automatic_tests.py",
             "build_automatic_tests.pyc"
         ]
-    ),
-    .testTarget(name: "SwiftUIInterpreterTests", dependencies: [
-        "SwiftInterpreter",
-        .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor"),
-        "ViewInspector"
-    ])
-
-]
+    )
+] + (SWIFTUI_SUPPORT ? [.testTarget(name: "SwiftUIInterpreterTests", dependencies: [
+    "SwiftInterpreter",
+    .product(name: "SwiftASTConstructor", package: "SwiftASTConstructor"),
+    "ViewInspector"
+])] : [])
 if BUILD_FROM_SOURCE {
     targets = [
         .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
