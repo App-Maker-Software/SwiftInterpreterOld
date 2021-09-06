@@ -15,10 +15,18 @@ if gitBranch.contains("develop") {
 
 // swiftui support only for binary builds
 var SWIFTUI_SUPPORT: Bool = false
-if gitBranch.contains("binary") || gitBranch.contains("main") {
+if gitBranch.contains("binary") || gitBranch.contains("main") || gitBranch.contains("private") {
     SWIFTUI_SUPPORT = true
 } else {
     SWIFTUI_SUPPORT = false
+}
+
+// product dependency name
+var productDepName = "SwiftInterpreterSource"
+if gitBranch.contains("binary") {
+    productDepName = "SwiftInterpreterBinary"
+} else if gitBranch.contains("private") {
+    productDepName = "SwiftInterpreterPrivate"
 }
 
 // Dependencies
@@ -60,7 +68,7 @@ let testTargets: [Target] = [
 ])] : [])
 if BUILD_FROM_SOURCE {
     targets = [
-        .target(name: "SwiftInterpreter", dependencies: ["SwiftInterpreterSource"]),
+        .target(name: "SwiftInterpreter", dependencies: [.product(name: productDepName, package: "SwiftInterpreterSource")]),
     ] + testTargets
 } else {
     targets = [

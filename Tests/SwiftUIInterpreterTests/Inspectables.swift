@@ -8,6 +8,8 @@
 import ViewInspector
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
+#elseif canImport(SwiftInterpreterPrivate)
+import SwiftInterpreterPrivate
 #else
 import SwiftInterpreterSource
 #endif

@@ -3,8 +3,12 @@ import SwiftSyntax
 import SwiftASTConstructor
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
+#elseif canImport(SwiftInterpreterPrivate)
+import SwiftInterpreterPrivate
 #else
 import SwiftInterpreterSource
+#endif
+#if canImport(SwiftASTScaffolded)
 import SwiftASTScaffolded
 #endif
 import ViewInspector
