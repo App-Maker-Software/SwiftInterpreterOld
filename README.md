@@ -67,9 +67,12 @@ There are three assertions currently supported.
 
 Note: The Swift Interpreter is provided as a prebuilt binary, if you would like to have access to source, contact Joe Hinkle.
 
+## Branching
 
-## XCFramework Stub
+The `Package.swift` file will check which branch you're on and change it's behavior.
 
-There is a "stub" of the Swift Interpreter XCFramework which is simply an empty XCFramework. This existence of this stub is to allow for a hack for schema-tied dependencies in Swift Packages until conditional target dependencies is fully implemented in SPM. https://github.com/apple/swift-evolution/blob/main/proposals/0273-swiftpm-conditional-target-dependencies.md
-
-The hack works by having a build script swap out a hard link to either point to the real XCFramework or the stub depending on the selected scheme. i.e. "Debug" builds will have the hard link point to the real XCFramework, while "Release" builds will point to the stub. This will probably only be used by [LiveApp](http://github.com/App-Maker-Software/LiveApp). There we are wanting to use the interpreter to provide developer tools, but we don't want to change how production builds work. 
+| Branch prefix | Behavior | Example |
+|-|-|-|
+|`main`| Uses prebuilt XCFramework |`main`|
+|`binary` or `main`| Enable SwiftUI tests |`develop-binary`|
+|`develop`| Builds interpreter from source via local filepath |`develop/your-name`|
