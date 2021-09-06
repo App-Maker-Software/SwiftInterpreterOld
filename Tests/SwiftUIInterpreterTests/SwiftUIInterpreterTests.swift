@@ -82,7 +82,7 @@ final class SwiftInterpreterSourceTests: XCTestCase {
         let testCode = #"Text("hello")"#
         let anyView = try simplyTestSomeCode(build: sourceFile, thenRun: testCode)
         let inspected = try anyView.inspect()
-        let view = try inspected.anyView().find(AMStructView.self).anyView().text()
+        let view = try inspected.anyView().text()
         let textString = try view.string()
         XCTAssertEqual(textString, "hello")
     }
@@ -1840,7 +1840,7 @@ let someText = Text("hello").padding()
         let testCode = "TestView()"
         let anyView = try simplyTestSomeCode(build: sourceFile, thenRun: testCode)
         let inspected = try anyView.inspect()
-        let view = try inspected.anyView().find(AMStructView.self).anyView().text()
+        let view = try inspected.anyView().find(AMStructView.self).anyView().anyView().text()
         let textString = try view.string()
         XCTAssertEqual(textString, "hello")
     }
@@ -1857,7 +1857,7 @@ let someText = Text("hello")
         let testCode = "TestView()"
         let anyView = try simplyTestSomeCode(build: sourceFile, thenRun: testCode)
         let inspected = try anyView.inspect()
-        let view = try inspected.anyView().find(AMStructView.self).anyView().text()
+        let view = try inspected.anyView().find(AMStructView.self).anyView().anyView().text()
         let textString = try view.string()
         XCTAssertEqual(textString, "hello")
     }

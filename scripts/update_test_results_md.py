@@ -26,14 +26,17 @@ class Result:
         self.link = link
 
 def handleTestcase(testcase):
-    classname = testcase.getAttribute("classname").replace("SwiftInterpreterTests.", "")
+    classname = testcase.getAttribute("classname").replace("SwiftInterpreterTests.", "").replace("SwiftUIInterpreterTests.SwiftInterpreterSourceTests","SwiftUI Tests").replace("SwiftUIInterpreterTests.SwiftInterpreterBinaryTests","SwiftUI Tests")
     name = testcase.getAttribute("name")
+    link = "https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/Tests/SwiftInterpreterTests/CodeTests/" + classname + "/" + remove_prefix(name.rstrip(string.digits), "test") + ".swift"
+    if classname == "SwiftUI Tests":
+        link = "https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/Tests/SwiftUIInterpreterTests/SwiftUIInterpreterTests.swift"
     result = Result(
         classname,
         name,
         testcase.getAttribute("time"),
         len(testcase.getElementsByTagName("failure")) > 0,
-        "https://github.com/App-Maker-Software/SwiftInterpreter/blob/main/Tests/SwiftInterpreterTests/CodeTests/" + classname + "/" + remove_prefix(name.rstrip(string.digits), "test") + ".swift"
+        link
     )
     if result.classname in results:
         results[result.classname].append(result)
@@ -63,7 +66,6 @@ def writeResultsToMdFile():
             else:
                 mdFile = mdFile + "| ✅ "
             mdFile = mdFile + "|" + result.name
-            mdFile = mdFile + "|" + result.time
             mdFile = mdFile + "|" + result.time
             mdFile = mdFile + "|[View Code](" + result.link + ")|"
             mdFile = mdFile + "\n"
