@@ -24,7 +24,7 @@ if gitBranch.contains("binary") || gitBranch.contains("main") || gitBranch.conta
 // product dependency name
 var productDepName = "SwiftInterpreterSource"
 if gitBranch.contains("binary") {
-    productDepName = "SwiftInterpreterBinary"
+    productDepName = "SwiftInterpreterBinarySource"
 } else if gitBranch.contains("private") {
     productDepName = "SwiftInterpreterPrivate"
 }
