@@ -4,11 +4,7 @@
 //
 
 import XCTest
-#if canImport(SwiftInterpreterBinary)
-import SwiftInterpreterBinary
-#else
-import SwiftInterpreterSource
-#endif
+import SwiftInterpreter
 
 #if !canImport(ObjectiveC)
 final class SwiftInterpreterAutomaticTests {

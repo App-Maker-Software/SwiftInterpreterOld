@@ -1,13 +1,7 @@
 import XCTest
 import SwiftSyntax
 import SwiftASTConstructor
-#if canImport(SwiftInterpreterBinary)
-import SwiftInterpreterBinary
-#elseif canImport(SwiftInterpreterPrivate)
-import SwiftInterpreterPrivate
-#else
-import SwiftInterpreterSource
-#endif
+import SwiftInterpreter
 #if canImport(SwiftASTScaffolded)
 import SwiftASTScaffolded
 #endif
@@ -17,10 +11,13 @@ import SwiftUI
 var hasSetup = false
 @available(iOS 13.0, macOS 10.15, *)
 final class SwiftInterpreterSourceTests: XCTestCase {
+    
+    let interpreter = SwiftInterpreter(license: .demo)
+    
     // helpers
     private func simplyTestSomeCode(build sourceFile: String, thenRun testCode: String) throws -> AnyView {
         // main module
-        var swiftModule = SwiftModule(name: "Test")
+        var swiftModule = interpreter.newSwiftModule(name: "Test")
         
         // source file
         #if canImport(SwiftInterpreterBinary)
@@ -28,11 +25,8 @@ final class SwiftInterpreterSourceTests: XCTestCase {
         let swiftFile = swiftModule.addSwiftFile(name: "test.swift", syntax: astData)
         #else
         let astData = [UInt8](try SwiftASTConstructor.constructAST(from: sourceFile))
-        let swiftFile = swiftModule.addSwiftFile(name: "test.swift", syntax: .init(d: astData, o: 0))
+        let swiftFile = swiftModule.addSwiftFile(name: "test.swift", syntyouax: .init(d: astData, o: 0))
         #endif
-        
-        // runtime staging
-        let swiftRuntimeStagging = SwiftRuntimeStaging(mainModule: swiftModule)
         
         // build all sources
         let swiftRuntime = try swiftRuntimeStagging.build()
@@ -42,10 +36,16 @@ final class SwiftInterpreterSourceTests: XCTestCase {
         
         // run test code
         #if canImport(SwiftInterpreterBinary)
-        let result = try swiftRuntime.runAsViewBuilder(testCodeAstData, in: swiftFile)
+        let result = try swiftRuntime.runAsViewBuilder(.init(
+            testCodeAstData,
+            swiftRuntimeObject: swiftFile
+        ))
         #else
         let testCodeScaffold = SwiftASTScaffolded.SourceFileSyntax(d: testCodeAstData, o: 0)
-        let result = try swiftRuntime.runAsViewBuilder(testCodeScaffold, in: swiftFile)
+        let result = try swiftRuntime.runAsViewBuilder(.init(
+            testCodeScaffold,
+            swiftRuntimeObject: swiftFile
+        ))
         #endif
         
         // return result
@@ -67,18 +67,13 @@ final class SwiftInterpreterSourceTests: XCTestCase {
         let testCodeScaffold = SwiftASTScaffolded.SourceFileSyntax(d: try [UInt8](constructAST(from: testCode)), o: 0)
         
         // run test code
-        let result = try swiftRuntime.runAsViewBuilder(testCodeScaffold, in: swiftModule)
+        let result = try swiftRuntime.runAsViewBuilder(.init(
+            testCodeScaffold,
+            swiftRuntimeObject: swiftModule
+        ))
         
         // return result
         return result
-    }
-    
-    override func setUp() {
-        super.setUp()
-        if !hasSetup {
-            try! unlock_demo(liveAppBundle: nil, connectToHotRefreshServer: false)
-            hasSetup = true
-        }
     }
     
     func testText() throws {

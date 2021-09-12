@@ -1,14 +1,11 @@
+// re-export symbols
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
-let libInterpret = SwiftInterpreterBinary.interpret
+public typealias SwiftInterpreter = SwiftInterpreterBinary.SwiftInterpreter
 #elseif canImport(SwiftInterpreterSource)
 import SwiftInterpreterSource
-let libInterpret = SwiftInterpreterSource.interpret
+public typealias SwiftInterpreter = SwiftInterpreterSource.SwiftInterpreter
 #elseif canImport(SwiftInterpreterBinarySource)
 import SwiftInterpreterBinarySource
-let libInterpret = SwiftInterpreterBinarySource.interpret
+public typealias SwiftInterpreter = SwiftInterpreterBinarySource.SwiftInterpreter
 #endif
-
-public func interpret(_ astData: [UInt8], using stack: Stack? = nil) throws {
-    try libInterpret(astData, stack)
-}
