@@ -8,12 +8,16 @@
 import ViewInspector
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
+typealias AMStructView = SwiftInterpreterBinary.AMStructView
 #elseif canImport(SwiftInterpreterPrivate)
 import SwiftInterpreterPrivate
+typealias AMStructView = SwiftInterpreterPrivate.AMStructView
 #elseif canImport(SwiftInterpreterBinarySource)
 import SwiftInterpreterBinarySource
+typealias AMStructView = SwiftInterpreterBinarySource.AMStructView
 #else
 import SwiftInterpreterSource
+typealias AMStructView = SwiftInterpreterSource.AMStructView
 #endif
 import SwiftUI
 
