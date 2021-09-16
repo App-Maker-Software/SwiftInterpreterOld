@@ -8,10 +8,12 @@ import SwiftASTConstructor
 #if canImport(SwiftAST)
 import SwiftAST
 #endif
-#if canImport(SwiftInterpreterBinary) || canImport(SwiftInterpreterSource)
+#if canImport(SwiftInterpreterBinary) || canImport(SwiftInterpreterSource) || canImport(SwiftInterpreterBinarySource)
 import SwiftInterpreter
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
+#elseif canImport(SwiftInterpreterBinarySource)
+import SwiftInterpreterBinarySource
 #else
 import SwiftInterpreterSource
 #endif
@@ -20,15 +22,18 @@ var hasSetup = false
 
 @discardableResult
 func interpretFromString(_ code: String, using stack: Stack? = nil) throws -> Any {
-    if !hasSetup {
-        try! unlock_demo(liveAppBundle: nil, connectToHotRefreshServer: false)
-        hasSetup = true
-    }
-    let astData = [UInt8](try SwiftASTConstructor.constructAST(from: code))
-    return try SwiftInterpreter.interpret(astData, using: stack)
+    let interpreter = SwiftInterpreter.shared
+    let astData = try SwiftASTConstructor.constructAST(from: code)
+    return try interpreter.interpretSync(astData, in: stack, jobDetails: SwiftInterpreterJob.Details(allowGlobalReturns: true)) as Any
 }
 
+typealias Stack = SwiftStack
 
+extension Stack {
+    static func createNewBase() -> Stack {
+        return Stack()
+    }
+}
 
 struct NilError: Error {}
 

@@ -18,7 +18,12 @@ final class SwiftInterpreterSourceTests: XCTestCase {
     /// will compile a source file in a swift module and then run some abritary code in that module
     private func simplyTestSomeCode(build sourceFile: String, thenRun testCode: String) throws -> AnyView {
         // main module
-        var swiftModule = try interpreter.newSwiftModule(name: "Test")
+        var swiftModule = try interpreter.newSwiftModule(
+            name: "Test",
+            jobDetails: SwiftInterpreterJob.Details(
+                
+            )
+        )
         
         // source file
         #if canImport(SwiftInterpreterBinary)
@@ -40,7 +45,7 @@ final class SwiftInterpreterSourceTests: XCTestCase {
         let result = try swiftModule.runAsViewBuilder(testCodeAstData)
         #else
         let testCodeScaffold = SwiftASTScaffolded.SourceFileSyntax(d: testCodeAstData, o: 0)
-        let result = try swiftModule.runAsViewBuilder(testCodeScaffold)
+        let result = try swiftModule.runAsViewBuilderSync(testCodeScaffold)
         #endif
         
         // return result
@@ -66,7 +71,7 @@ final class SwiftInterpreterSourceTests: XCTestCase {
         let result = try swiftModule.runAsViewBuilder(testCodeAstData)
         #else
         let testCodeScaffold = SwiftASTScaffolded.SourceFileSyntax(d: testCodeAstData, o: 0)
-        let result = try swiftModule.runAsViewBuilder(testCodeScaffold)
+        let result = try swiftModule.runAsViewBuilderSync(testCodeScaffold)
         #endif
         
         // return result
@@ -233,6 +238,32 @@ struct TestStateView2: some View {
         let reinspectedTestStateView = try testStateView.inspect().find(AMStructView.self).anyView().find(AMStructView.self).anyView().group()
         let textOfXValue2 = try reinspectedTestStateView.anyView(0).text()
         XCTAssertEqual(try textOfXValue2.string(), "5")
+    }
+    
+    func testViewBuilderModifier() throws {
+        let sourceFile = """
+struct TestView: View {
+    @ViewBuilder
+    var example: some View {
+        Text("hello")
+        Text("hello2")
+    }
+    var body: some View {
+        example
+    }
+}
+"""
+        let testCode = "TestView()"
+        let anyView = try simplyTestSomeCode(build: sourceFile, thenRun: testCode)
+        let inspected = try anyView.inspect()
+        let structView = try inspected.anyView().find(AMStructView.self).anyView()
+        XCTAssertNotNil(structView)
+        let subview1 = try structView.group().anyView(0).text()
+        let textString = try subview1.string()
+        XCTAssertEqual(textString, "hello")
+        let subview2 = try structView.group().anyView(1).text()
+        let textString2 = try subview2.string()
+        XCTAssertEqual(textString2, "hello2")
     }
     
     func testStructWithTwoOfSameTypeEmbeded() throws {

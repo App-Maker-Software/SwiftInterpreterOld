@@ -9,7 +9,7 @@ import SwiftInterpreter
 #if !canImport(ObjectiveC)
 final class SwiftInterpreterAutomaticTests {
     public static let testCases: [XCTestCaseEntry] = [
-        testCase(SimpleVariableChange.allTests),        testCase(Modulus.allTests),        testCase(IfBlock.allTests),        testCase(Encapsulation.allTests),        testCase(SimpleString.allTests),        testCase(Comparisons.allTests),        testCase(TernaryOperators.allTests),        testCase(Array.allTests),        testCase(Recursion.allTests),        testCase(FunctionalProgramming.allTests),        testCase(Extensions.allTests),        testCase(SimpleFunctionCallToPassValues.allTests),        testCase(Equality.allTests),        testCase(DeclarationOrder.allTests),        testCase(Boolean.allTests),        testCase(StressTest.allTests),        testCase(SortingFunction.allTests),        testCase(Switch.allTests),        testCase(SimpleFunctionCall.allTests),        testCase(Loops.allTests),        testCase(Generic.allTests),        testCase(Closures.allTests),        testCase(Import.allTests),        testCase(UnaryOperators.allTests),        testCase(DeclareWithType.allTests),
+        testCase(SimpleVariableChange.allTests),        testCase(Modulus.allTests),        testCase(IfBlock.allTests),        testCase(Encapsulation.allTests),        testCase(SimpleString.allTests),        testCase(Comparisons.allTests),        testCase(TernaryOperators.allTests),        testCase(Array.allTests),        testCase(Recursion.allTests),        testCase(Mutation.allTests),        testCase(FunctionalProgramming.allTests),        testCase(Extensions.allTests),        testCase(SimpleFunctionCallToPassValues.allTests),        testCase(Equality.allTests),        testCase(DeclarationOrder.allTests),        testCase(Boolean.allTests),        testCase(StressTest.allTests),        testCase(SortingFunction.allTests),        testCase(Switch.allTests),        testCase(SimpleFunctionCall.allTests),        testCase(Loops.allTests),        testCase(Generic.allTests),        testCase(Closures.allTests),        testCase(Import.allTests),        testCase(UnaryOperators.allTests),        testCase(DeclareWithType.allTests),
     ]
 }
 #endif
@@ -3241,6 +3241,142 @@ final class Recursion: XCTestCase {
         ("testSimpleRecursion3", testSimpleRecursion3),
         ("testSimpleRecursion4", testSimpleRecursion4),
         ("testSimpleRecursion5", testSimpleRecursion5),
+    ]
+}
+
+final class Mutation: XCTestCase {
+
+    func testSimpleMutation1() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            x = x + 5
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            x = x + 5
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleMutation2() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            x = x + 5
+            x = x - 2
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            x = x + 5
+            x = x - 2
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleMutation3() throws {
+        let stack = Stack.createNewBase()
+        var expectedValueOnStack: Any? = nil
+        try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            var x = 5
+            x += 3
+            //
+            // end interpreted section
+            //
+        """, using: stack)
+        func testRealSwift() {
+            //
+            // start compiled section
+            //
+            var x = 5
+            x += 3
+            //
+            // end compiled section
+            //
+            expectedValueOnStack = x
+        }
+        testRealSwift()
+        let interpretedResult = try stack.get("x") as Any
+        let realResult = try expectedValueOnStack.unwrap()
+        
+        XCTAssertEqual(String(describing: interpretedResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedResult)), String(describing: type(of: realResult)))
+    }
+
+    func testSimpleMutation4() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            x += 3
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testSimpleMutation5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            x = x + 5
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    static var allTests = [
+        ("testSimpleMutation1", testSimpleMutation1),
+        ("testSimpleMutation2", testSimpleMutation2),
+        ("testSimpleMutation3", testSimpleMutation3),
+        ("testSimpleMutation4", testSimpleMutation4),
+        ("testSimpleMutation5", testSimpleMutation5),
     ]
 }
 

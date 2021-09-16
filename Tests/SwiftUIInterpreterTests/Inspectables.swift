@@ -9,15 +9,19 @@ import ViewInspector
 #if canImport(SwiftInterpreterBinary)
 import SwiftInterpreterBinary
 typealias AMStructView = SwiftInterpreterBinary.AMStructView
+typealias SwiftInterpreterJob = SwiftInterpreterBinary.SwiftInterpreterJob
 #elseif canImport(SwiftInterpreterPrivate)
 import SwiftInterpreterPrivate
 typealias AMStructView = SwiftInterpreterPrivate.AMStructView
+typealias SwiftInterpreterJob = SwiftInterpreterPrivate.SwiftInterpreterJob
 #elseif canImport(SwiftInterpreterBinarySource)
 import SwiftInterpreterBinarySource
 typealias AMStructView = SwiftInterpreterBinarySource.AMStructView
+typealias SwiftInterpreterJob = SwiftInterpreterBinarySource.SwiftInterpreterJob
 #else
 import SwiftInterpreterSource
 typealias AMStructView = SwiftInterpreterSource.AMStructView
+typealias SwiftInterpreterJob = SwiftInterpreterSource.SwiftInterpreterJob
 #endif
 import SwiftUI
 
