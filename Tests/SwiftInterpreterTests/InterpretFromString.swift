@@ -21,7 +21,7 @@ import SwiftInterpreterSource
 var hasSetup = false
 
 @discardableResult
-func interpretFromString(_ code: String, using stack: Stack? = nil) throws -> Any {
+func interpretFromString(_ code: String, using stack: Stack = Stack.createNewBase()) throws -> Any {
     let interpreter = SwiftInterpreter.shared
     let astData = try SwiftASTConstructor.constructAST(from: code)
     return try interpreter.interpretSync(astData, in: stack, jobDetails: SwiftInterpreterJob.Details(allowGlobalReturns: true)) as Any

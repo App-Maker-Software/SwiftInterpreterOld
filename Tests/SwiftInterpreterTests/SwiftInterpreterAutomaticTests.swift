@@ -9,7 +9,7 @@ import SwiftInterpreter
 #if !canImport(ObjectiveC)
 final class SwiftInterpreterAutomaticTests {
     public static let testCases: [XCTestCaseEntry] = [
-        testCase(SimpleVariableChange.allTests),        testCase(Modulus.allTests),        testCase(IfBlock.allTests),        testCase(Encapsulation.allTests),        testCase(SimpleString.allTests),        testCase(Comparisons.allTests),        testCase(TernaryOperators.allTests),        testCase(Array.allTests),        testCase(Recursion.allTests),        testCase(Mutation.allTests),        testCase(FunctionalProgramming.allTests),        testCase(Extensions.allTests),        testCase(SimpleFunctionCallToPassValues.allTests),        testCase(Equality.allTests),        testCase(DeclarationOrder.allTests),        testCase(Boolean.allTests),        testCase(StressTest.allTests),        testCase(SortingFunction.allTests),        testCase(Switch.allTests),        testCase(SimpleFunctionCall.allTests),        testCase(Loops.allTests),        testCase(Generic.allTests),        testCase(Closures.allTests),        testCase(Import.allTests),        testCase(UnaryOperators.allTests),        testCase(DeclareWithType.allTests),
+        testCase(SimpleVariableChange.allTests),        testCase(Modulus.allTests),        testCase(IfBlock.allTests),        testCase(Encapsulation.allTests),        testCase(SimpleString.allTests),        testCase(Comparisons.allTests),        testCase(TernaryOperators.allTests),        testCase(Array.allTests),        testCase(Recursion.allTests),        testCase(Mutation.allTests),        testCase(FunctionalProgramming.allTests),        testCase(Extensions.allTests),        testCase(SimpleFunctionCallToPassValues.allTests),        testCase(Equality.allTests),        testCase(DeclarationOrder.allTests),        testCase(Boolean.allTests),        testCase(NumberTypes.allTests),        testCase(StressTest.allTests),        testCase(SortingFunction.allTests),        testCase(Switch.allTests),        testCase(SimpleFunctionCall.allTests),        testCase(Loops.allTests),        testCase(Generic.allTests),        testCase(Closures.allTests),        testCase(Import.allTests),        testCase(UnaryOperators.allTests),        testCase(DeclareWithType.allTests),
     ]
 }
 #endif
@@ -5423,6 +5423,258 @@ final class Boolean: XCTestCase {
     ]
 }
 
+final class NumberTypes: XCTestCase {
+
+    func testNumberTypeGiven1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Double = 5.5
+            let y: Double = 5.7
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x: Double = 5.5
+            let y: Double = 5.7
+            return x + y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNumberTypeGiven2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Int = 3
+            let y: Int = 5
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x: Int = 3
+            let y: Int = 5
+            return x + y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNumberTypeGiven3() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Double = 3
+            let y: Double = 5
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x: Double = 3
+            let y: Double = 5
+            return x + y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNumberTypeGiven4() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Int = 3
+            let y: Double = 5
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testNumberTypeGiven5() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: Int = 3.5
+            return x
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testNumberTypeGiven6() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x: UInt = -1
+            return x
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testNumberTypeGiven7() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = 5.5
+            return x + y
+            
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testNumberTypeInference1() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5.5
+            let y = 5.7
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 5.5
+            let y = 5.7
+            return x + y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNumberTypeInference2() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 3
+            let y = 5
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            let x = 3
+            let y = 5
+            return x + y
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    func testNumberTypeInference3() throws {
+        do { let returnedValue = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            let x = 5
+            let y = 5.5
+            return x + y
+            //
+            // end interpreted section
+            //
+        """) as Any; XCTFail("Interpreted Swift \"compiled\" that should not have! It recieved a return value of \(String(describing: returnedValue))")} catch {XCTAssertTrue(true)}
+    }
+
+    func testNumberTypeInference4() throws {
+        let interpretedReturnResult = try interpretFromString("""
+            //
+            // start interpreted section
+            //
+            return 5 + 5.3
+            
+            //
+            // end interpreted section
+            //
+        """) as Any
+        func testRealSwift() -> Any {
+            //
+            // start compiled section
+            //
+            return 5 + 5.3
+            
+            //
+            // end compiled section
+            //
+        }
+        let realResult = testRealSwift()
+        XCTAssertEqual(String(describing: interpretedReturnResult), String(describing: realResult))
+        XCTAssertEqual(String(describing: type(of: interpretedReturnResult)), String(describing: type(of: realResult)))
+    }
+
+    static var allTests = [
+        ("testNumberTypeGiven1", testNumberTypeGiven1),
+        ("testNumberTypeGiven2", testNumberTypeGiven2),
+        ("testNumberTypeGiven3", testNumberTypeGiven3),
+        ("testNumberTypeGiven4", testNumberTypeGiven4),
+        ("testNumberTypeGiven5", testNumberTypeGiven5),
+        ("testNumberTypeGiven6", testNumberTypeGiven6),
+        ("testNumberTypeGiven7", testNumberTypeGiven7),
+        ("testNumberTypeInference1", testNumberTypeInference1),
+        ("testNumberTypeInference2", testNumberTypeInference2),
+        ("testNumberTypeInference3", testNumberTypeInference3),
+        ("testNumberTypeInference4", testNumberTypeInference4),
+    ]
+}
+
 final class StressTest: XCTestCase {
 
     func testDeepNest1() throws {
@@ -6467,6 +6719,9 @@ final class Loops: XCTestCase {
             repeat {
                 i = i + 1
             } while i < 10
+            repeat {
+                i = i + 1
+            } while i < 10
             
             //
             // end interpreted section
@@ -6477,6 +6732,9 @@ final class Loops: XCTestCase {
             // start compiled section
             //
             var i = 1
+            repeat {
+                i = i + 1
+            } while i < 10
             repeat {
                 i = i + 1
             } while i < 10

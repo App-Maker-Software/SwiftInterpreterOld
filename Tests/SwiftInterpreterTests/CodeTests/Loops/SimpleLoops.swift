@@ -9,3 +9,6 @@ var i = 1
 repeat {
     i = i + 1
 } while i < 10
+repeat {
+    i = i + 1
+} while i < 10
